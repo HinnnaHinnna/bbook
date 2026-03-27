@@ -84,6 +84,9 @@ document.addEventListener("DOMContentLoaded", () => {
     lastRightDragY: 0,
     scratchItemId: null,
 
+    /*
+      모바일 문지르기 / 두 손가락 시점 이동 상태
+    */
     mobileScratchTouchId: null,
     mobileScratchStartX: 0,
     mobileScratchStartY: 0,
@@ -1128,6 +1131,23 @@ document.addEventListener("DOMContentLoaded", () => {
 
       return closestItem;
     }
+    async function unlockAudioForItem(item) {
+      if (!item || item.isDecorative || !item.audio) return;
+
+      const audio = getOrCreateAudio(item);
+
+      try {
+        audio.muted = true;
+        audio.currentTime = 0;
+        await audio.play();
+        audio.pause();
+        audio.currentTime = 0;
+        audio.muted = false;
+      } catch (error) {
+        audio.muted = false;
+        console.warn("모바일 오디오 unlock 실패:", error);
+      }
+    }
 
     async function onTouchStart(event) {
       if (!state.started) return;
@@ -1150,6 +1170,15 @@ document.addEventListener("DOMContentLoaded", () => {
       state.mobileScratchStartX = touch.clientX;
       state.mobileScratchStartY = touch.clientY;
       state.mobileScratchMoved = false;
+
+      /*
+        터치 시작 순간에 책등을 먼저 찾고,
+        모바일 브라우저용 오디오 unlock을 시도한다.
+      */
+      const item = getItemFromClientPoint(touch.clientX, touch.clientY);
+      if (item) {
+        await unlockAudioForItem(item);
+      }
     }
 
     async function onTouchMove(event) {
@@ -1280,9 +1309,6 @@ document.addEventListener("DOMContentLoaded", () => {
     state.selectedId = item.id;
     state.iconActivatedMap.set(item.id, true);
 
-    /*
-      다른 책등이 재생 중이면 멈춤
-    */
     if (state.currentPlayingId && state.currentPlayingId !== item.id) {
       const previousItem = state.itemMap.get(state.currentPlayingId);
       if (previousItem) {
@@ -1301,7 +1327,7 @@ document.addEventListener("DOMContentLoaded", () => {
       updateIcon(item.id, "playing");
       document.body.classList.add("is-scratching");
     } catch (error) {
-      console.error("스크래치 재생 실패:", error);
+      console.error("스크래치 재생 실패:", item.id, item.audio, error);
     }
   }
 
