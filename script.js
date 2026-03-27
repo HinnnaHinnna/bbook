@@ -78,6 +78,16 @@ document.addEventListener("DOMContentLoaded", () => {
   */
   const scratchTextureScale = 4;
 
+  /*
+  오디오 증폭 설정
+  1 = 원본 크기
+  1.6 ~ 2.2 정도부터 체감상 더 커짐
+*/
+  const audioBoost = 1.9;
+
+  let sharedAudioContext = null;
+  const audioNodeMap = new Map();
+
   /* =========================
      상태
   ========================= */
@@ -691,6 +701,40 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const audio = new Audio(item.audio);
     audio.preload = "auto";
+    audio.volume = 1;
+
+    /*
+      AudioContext는 사용자 제스처 이후에 실제 동작
+    */
+    if (!sharedAudioContext) {
+      const AudioContextClass =
+        window.AudioContext || window.webkitAudioContext;
+
+      if (AudioContextClass) {
+        sharedAudioContext = new AudioContextClass();
+      }
+    }
+
+    if (sharedAudioContext) {
+      const sourceNode = sharedAudioContext.createMediaElementSource(audio);
+      const gainNode = sharedAudioContext.createGain();
+
+      gainNode.gain.value = audioBoost;
+
+      sourceNode.connect(gainNode);
+      gainNode.connect(sharedAudioContext.destination);
+
+      audioNodeMap.set(item.id, {
+        sourceNode,
+        gainNode
+      });
+    }
+
+    audio.addEventListener("play", () => {
+      if (sharedAudioContext?.state === "suspended") {
+        sharedAudioContext.resume().catch(() => { });
+      }
+    });
 
     audio.addEventListener("ended", () => {
       state.audioStateMap.set(item.id, "stopped");
@@ -703,7 +747,6 @@ document.addEventListener("DOMContentLoaded", () => {
       if (state.currentPlayingId === item.id) {
         state.currentPlayingId = null;
       }
-
     });
 
     audio.addEventListener("error", () => {
@@ -713,7 +756,6 @@ document.addEventListener("DOMContentLoaded", () => {
       if (state.currentPlayingId === item.id) {
         state.currentPlayingId = null;
       }
-
     });
 
     state.audioMap.set(item.id, audio);

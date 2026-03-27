@@ -116,13 +116,15 @@ body {
 .intro-marquee__track {
   display: flex;
   width: max-content;
-  gap: 56px;
+  gap: 0;
   padding: 8px 0 10px;
   animation: intro-marquee-move 12s linear infinite;
 }
 
 .intro-marquee__track span {
+  display: block;
   white-space: nowrap;
+  padding-right: 56px;
   font-size: 15px;
   line-height: 1.4;
   color: #000000;
@@ -166,6 +168,7 @@ body {
 
   .intro-marquee__track span {
     font-size: 15px;
+    padding-right: 40px;
   }
 }
 
