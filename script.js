@@ -149,7 +149,7 @@ document.addEventListener("DOMContentLoaded", () => {
     introOverlay.classList.add("is-hidden");
 
     guideText.innerHTML = state.isTouchDevice
-      ? "데스크탑에서는 마우스 드래그로 시점을 바꾸고,<br>W A S D 또는 화살표 키로 이동합니다.<br>모바일에서는 화면 드래그로 시점을 바꾸고,<br>화면 아래 이동 버튼으로 걸어다닙니다."
+      ? "W A S D 또는 화살표 키로 이동하세요. 마우스 오른쪽 버튼을 누르면서 드래그하면 시점이 바뀝니다. 마우스 왼쪽 버튼을 누르면서 책등을 긁을 때만 서평을 들을 수 있습니다."
       : "W A S D 또는 화살표 키로 이동하세요. 마우스 오른쪽 버튼을 누르면서 드래그하면 시점이 바뀝니다. 마우스 왼쪽 버튼을 누르면서 책등을 긁을 때만 서평을 들을 수 있습니다.";
   }
 
