@@ -11,7 +11,7 @@
 
 window.EXHIBITION_DATA = {
   settings: {
-    spawnPosition: { x: -87, y: 0, z: 4 },
+    spawnPosition: { x: -77, y: 0, z: 4 },
 
     desktopAcceleration: 45,
     mobileMoveSpeed: 3.2,
@@ -230,7 +230,7 @@ window.EXHIBITION_DATA = {
       image: "assets/images/intro-panel-02.png",
       spineHeightMm: 11.2,
       spineWidthMm: 400,
-      xOffset: -77.98,
+      xOffset: -79.18,
       yOffset: 0,
       zOffset: 10,
       isDecorative: true
@@ -241,7 +241,7 @@ window.EXHIBITION_DATA = {
       image: "assets/images/intro-panel-03.png",
       spineHeightMm: 11.2,
       spineWidthMm: 485,
-      xOffset: -77.96,
+      xOffset: -80.36,
       yOffset: 0,
       zOffset: 10,
       isDecorative: true
@@ -252,7 +252,7 @@ window.EXHIBITION_DATA = {
       image: "assets/images/intro-panel-04.png",
       spineHeightMm: 11.2,
       spineWidthMm: 363,
-      xOffset: -77.94,
+      xOffset: -81.54,
       yOffset: 0,
       zOffset: 10,
       isDecorative: true
@@ -263,7 +263,7 @@ window.EXHIBITION_DATA = {
       image: "assets/images/intro-panel-05.png",
       spineHeightMm: 11.2,
       spineWidthMm: 180,
-      xOffset: -77.92,
+      xOffset: -82.72,
       yOffset: 0,
       zOffset: 10,
       isDecorative: true
