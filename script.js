@@ -704,7 +704,7 @@ document.addEventListener("DOMContentLoaded", () => {
     audio.volume = 1;
 
     /*
-      모바일 브라우저에서 inline 재생 허용
+      모바일 브라우저에서 인라인 재생 허용
     */
     audio.playsInline = true;
     audio.setAttribute("playsinline", "");
