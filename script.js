@@ -1262,502 +1262,487 @@ document.addEventListener("DOMContentLoaded", () => {
       document.body.classList.remove("is-scratching");
       pauseScratchPlayback();
     });
+  }
 
-    function setupMobileTouchInteraction() {
-      if (!state.isTouchDevice) return;
+  function setupMobileTouchInteraction() {
+    if (!state.isTouchDevice) return;
 
-      const scratchMoveThreshold = 10;
+    const scratchMoveThreshold = 10;
 
-      function getSceneCanvas() {
-        return scene?.canvas || scene?.querySelector?.("canvas") || null;
+    function getSceneCanvas() {
+      return scene?.canvas || scene?.querySelector?.("canvas") || null;
+    }
+
+    function getTouchById(touchList, id) {
+      for (const touch of touchList) {
+        if (touch.identifier === id) return touch;
       }
+      return null;
+    }
 
+    function isUiTarget(target) {
+      if (!(target instanceof Element)) return false;
+      return Boolean(
+        target.closest(".move-btn, .ghost-btn, .top-ui, .intro-overlay")
+      );
+    }
 
-      function getTouchById(touchList, id) {
-        for (const touch of touchList) {
-          if (touch.identifier === id) return touch;
-        }
+    function getTouchCenter(touchA, touchB) {
+      return {
+        x: (touchA.clientX + touchB.clientX) / 2,
+        y: (touchA.clientY + touchB.clientY) / 2
+      };
+    }
+
+    function startMobileLookDrag(touches) {
+      resetScratchStroke();
+
+      if (touches.length < 2) return;
+
+      state.mobileScratchTouchId = null;
+      state.mobileScratchMoved = false;
+
+      state.mobileLookTouchIds = [
+        touches[0].identifier,
+        touches[1].identifier
+      ];
+
+      const center = getTouchCenter(touches[0], touches[1]);
+      state.mobileLookLastCenterX = center.x;
+      state.mobileLookLastCenterY = center.y;
+
+      document.body.classList.add("is-view-dragging");
+      document.body.classList.remove("is-scratching");
+    }
+
+    function stopMobileLookDrag() {
+      state.mobileLookTouchIds = [];
+      document.body.classList.remove("is-view-dragging");
+    }
+
+    function resetMobileScratchState() {
+      state.mobileScratchTouchId = null;
+      state.mobileScratchStartX = 0;
+      state.mobileScratchStartY = 0;
+      state.mobileScratchMoved = false;
+    }
+
+    function resetMobileTouchState() {
+      resetMobileScratchState();
+      stopMobileLookDrag();
+    }
+
+    window.resetMobileTouchState = resetMobileTouchState;
+
+    function getItemFromClientPoint(clientX, clientY) {
+      const canvas = getSceneCanvas();
+      const threeCamera = camera.getObject3D("camera");
+
+      if (!canvas || !threeCamera) return null;
+
+      const rect = canvas.getBoundingClientRect();
+
+      if (
+        clientX < rect.left ||
+        clientX > rect.right ||
+        clientY < rect.top ||
+        clientY > rect.bottom
+      ) {
         return null;
       }
 
-      function isUiTarget(target) {
-        if (!(target instanceof Element)) return false;
-        return Boolean(
-          target.closest(".move-btn, .ghost-btn, .top-ui, .intro-overlay")
-        );
-      }
+      const ndc = new THREE.Vector2(
+        ((clientX - rect.left) / rect.width) * 2 - 1,
+        -((clientY - rect.top) / rect.height) * 2 + 1
+      );
 
-      function getTouchCenter(touchA, touchB) {
-        return {
-          x: (touchA.clientX + touchB.clientX) / 2,
-          y: (touchA.clientY + touchB.clientY) / 2
-        };
-      }
+      const raycaster = new THREE.Raycaster();
+      raycaster.setFromCamera(ndc, threeCamera);
 
-      function startMobileLookDrag(touches) {
+      let closestItem = null;
+      let closestDistance = Infinity;
 
-        resetScratchStroke();
+      state.itemMap.forEach((item) => {
+        if (item.isDecorative || !item.hitboxRef) return;
 
-        if (touches.length < 2) return;
-
-        state.mobileScratchTouchId = null;
-        state.mobileScratchMoved = false;
-
-        state.mobileLookTouchIds = [touches[0].identifier, touches[1].identifier];
-
-        const center = getTouchCenter(touches[0], touches[1]);
-        state.mobileLookLastCenterX = center.x;
-        state.mobileLookLastCenterY = center.y;
-
-        document.body.classList.add("is-view-dragging");
-        document.body.classList.remove("is-scratching");
-      }
-
-      function stopMobileLookDrag() {
-        state.mobileLookTouchIds = [];
-        document.body.classList.remove("is-view-dragging");
-      }
-
-      function resetMobileScratchState() {
-        state.mobileScratchTouchId = null;
-        state.mobileScratchStartX = 0;
-        state.mobileScratchStartY = 0;
-        state.mobileScratchMoved = false;
-      }
-
-      function resetMobileTouchState() {
-        resetMobileScratchState();
-        stopMobileLookDrag();
-      }
-
-      window.resetMobileTouchState = resetMobileTouchState;
-
-      function getItemFromClientPoint(clientX, clientY) {
-        const canvas = getSceneCanvas();
-        const threeCamera = camera.getObject3D("camera");
-
-        if (!canvas || !threeCamera) return null;
-
-        const rect = canvas.getBoundingClientRect();
-
-        if (
-          clientX < rect.left ||
-          clientX > rect.right ||
-          clientY < rect.top ||
-          clientY > rect.bottom
-        ) {
-          return null;
-        }
-
-        const ndc = new THREE.Vector2(
-          ((clientX - rect.left) / rect.width) * 2 - 1,
-          -((clientY - rect.top) / rect.height) * 2 + 1
+        const intersections = raycaster.intersectObject(
+          item.hitboxRef.object3D,
+          true
         );
 
-        const raycaster = new THREE.Raycaster();
-        raycaster.setFromCamera(ndc, threeCamera);
+        if (!intersections.length) return;
 
-        let closestItem = null;
-        let closestDistance = Infinity;
+        const hit = intersections[0];
+        if (hit.distance < closestDistance) {
+          closestDistance = hit.distance;
+          closestItem = item;
+        }
+      });
 
-        state.itemMap.forEach((item) => {
-          if (item.isDecorative || !item.hitboxRef) return;
+      return closestItem;
+    }
 
-          const intersections = raycaster.intersectObject(
-            item.hitboxRef.object3D,
-            true
-          );
+    async function unlockAudioForItem(item) {
+      if (!item || item.isDecorative || !item.audio) return;
 
-          if (!intersections.length) return;
+      const audio = getOrCreateAudio(item);
 
-          const hit = intersections[0];
-          if (hit.distance < closestDistance) {
-            closestDistance = hit.distance;
-            closestItem = item;
-          }
-        });
-
-        return closestItem;
+      try {
+        audio.muted = true;
+        audio.currentTime = 0;
+        await audio.play();
+        audio.pause();
+        audio.currentTime = 0;
+        audio.muted = false;
+      } catch (error) {
+        audio.muted = false;
+        console.warn("모바일 오디오 unlock 실패:", error);
       }
-      async function unlockAudioForItem(item) {
-        if (!item || item.isDecorative || !item.audio) return;
+    }
 
-        const audio = getOrCreateAudio(item);
+    async function onTouchStart(event) {
+      if (!state.started) return;
+      if (isUiTarget(event.target)) return;
 
-        try {
-          audio.muted = true;
-          audio.currentTime = 0;
-          await audio.play();
-          audio.pause();
-          audio.currentTime = 0;
-          audio.muted = false;
-        } catch (error) {
-          audio.muted = false;
-          console.warn("모바일 오디오 unlock 실패:", error);
-        }
-      }
-
-      async function onTouchStart(event) {
-        if (!state.started) return;
-        if (isUiTarget(event.target)) return;
-
-        if (event.touches.length >= 2) {
-          event.preventDefault();
-          startMobileLookDrag(event.touches);
-          return;
-        }
-
-        if (event.touches.length !== 1) return;
-
-        const touch = event.changedTouches[0];
-        if (!touch) return;
-
-        stopMobileLookDrag();
-
-        state.mobileScratchTouchId = touch.identifier;
-        state.mobileScratchStartX = touch.clientX;
-        state.mobileScratchStartY = touch.clientY;
-        state.mobileScratchMoved = false;
-
-        /*
-          터치 시작 순간에 책등을 먼저 찾고,
-          모바일 브라우저용 오디오 unlock을 시도한다.
-        */
-        const item = getItemFromClientPoint(touch.clientX, touch.clientY);
-        if (item) {
-          await unlockAudioForItem(item);
-        }
-      }
-
-      async function onTouchMove(event) {
-        if (!state.started) return;
-
-        /*
-          1) 두 손가락일 때는 시점 이동
-        */
-        if (state.mobileLookTouchIds.length === 2) {
-          const touchA = getTouchById(event.touches, state.mobileLookTouchIds[0]);
-          const touchB = getTouchById(event.touches, state.mobileLookTouchIds[1]);
-
-          if (touchA && touchB) {
-            event.preventDefault();
-
-            const lookControls = camera.components["look-controls"];
-            if (!lookControls) return;
-
-            const center = getTouchCenter(touchA, touchB);
-            const dx = center.x - state.mobileLookLastCenterX;
-            const dy = center.y - state.mobileLookLastCenterY;
-
-            state.mobileLookLastCenterX = center.x;
-            state.mobileLookLastCenterY = center.y;
-
-            const yawSpeed = 0.0045;
-            const pitchSpeed = 0.0035;
-
-            lookControls.yawObject.rotation.y -= dx * yawSpeed;
-            lookControls.pitchObject.rotation.x -= dy * pitchSpeed;
-
-            const maxPitch = Math.PI / 2 - 0.05;
-            const minPitch = -Math.PI / 2 + 0.05;
-
-            lookControls.pitchObject.rotation.x = Math.max(
-              minPitch,
-              Math.min(maxPitch, lookControls.pitchObject.rotation.x)
-            );
-          }
-
-          return;
-        }
-
-        /*
-          2) 한 손가락일 때는 '문지르기' 오디오
-        */
-        if (state.mobileScratchTouchId === null) return;
-        if (event.touches.length !== 1) return;
-
-        const touch = getTouchById(event.touches, state.mobileScratchTouchId);
-        if (!touch) return;
-
-        const movedDistance = Math.hypot(
-          touch.clientX - state.mobileScratchStartX,
-          touch.clientY - state.mobileScratchStartY
-        );
-
-        /*
-          살짝 탭한 정도는 무시
-        */
-        if (movedDistance < scratchMoveThreshold) return;
-
+      if (event.touches.length >= 2) {
         event.preventDefault();
-        state.mobileScratchMoved = true;
+        startMobileLookDrag(event.touches);
+        return;
+      }
 
-        const scratchedItem = handleScratchAtClientPoint(
-          touch.clientX,
-          touch.clientY
+      if (event.touches.length !== 1) return;
+
+      const touch = event.changedTouches[0];
+      if (!touch) return;
+
+      stopMobileLookDrag();
+
+      state.mobileScratchTouchId = touch.identifier;
+      state.mobileScratchStartX = touch.clientX;
+      state.mobileScratchStartY = touch.clientY;
+      state.mobileScratchMoved = false;
+
+      const item = getItemFromClientPoint(touch.clientX, touch.clientY);
+      if (item) {
+        await unlockAudioForItem(item);
+      }
+    }
+
+    async function onTouchMove(event) {
+      if (!state.started) return;
+
+      if (state.mobileLookTouchIds.length === 2) {
+        const touchA = getTouchById(event.touches, state.mobileLookTouchIds[0]);
+        const touchB = getTouchById(event.touches, state.mobileLookTouchIds[1]);
+
+        if (touchA && touchB) {
+          event.preventDefault();
+
+          const lookControls = camera.components["look-controls"];
+          if (!lookControls) return;
+
+          const center = getTouchCenter(touchA, touchB);
+          const dx = center.x - state.mobileLookLastCenterX;
+          const dy = center.y - state.mobileLookLastCenterY;
+
+          state.mobileLookLastCenterX = center.x;
+          state.mobileLookLastCenterY = center.y;
+
+          const yawSpeed = 0.0045;
+          const pitchSpeed = 0.0035;
+
+          lookControls.yawObject.rotation.y -= dx * yawSpeed;
+          lookControls.pitchObject.rotation.x -= dy * pitchSpeed;
+
+          const maxPitch = Math.PI / 2 - 0.05;
+          const minPitch = -Math.PI / 2 + 0.05;
+
+          lookControls.pitchObject.rotation.x = Math.max(
+            minPitch,
+            Math.min(maxPitch, lookControls.pitchObject.rotation.x)
+          );
+        }
+
+        return;
+      }
+
+      if (state.mobileScratchTouchId === null) return;
+      if (event.touches.length !== 1) return;
+
+      const touch = getTouchById(event.touches, state.mobileScratchTouchId);
+      if (!touch) return;
+
+      const movedDistance = Math.hypot(
+        touch.clientX - state.mobileScratchStartX,
+        touch.clientY - state.mobileScratchStartY
+      );
+
+      if (movedDistance < scratchMoveThreshold) return;
+
+      event.preventDefault();
+      state.mobileScratchMoved = true;
+
+      const scratchedItem = handleScratchAtClientPoint(
+        touch.clientX,
+        touch.clientY
+      );
+
+      if (!scratchedItem) {
+        return;
+      }
+
+      if (state.scratchItemId === scratchedItem.id) return;
+
+      await startScratchPlayback(scratchedItem);
+    }
+
+    function onTouchEnd(event) {
+      const scratchEnded = Array.from(event.changedTouches).some(
+        (touch) => touch.identifier === state.mobileScratchTouchId
+      );
+
+      if (scratchEnded) {
+        resetMobileScratchState();
+        resetScratchStroke();
+        pauseScratchPlayback();
+      }
+
+      if (state.mobileLookTouchIds.length === 2) {
+        const touchAStillExists = getTouchById(
+          event.touches,
+          state.mobileLookTouchIds[0]
+        );
+        const touchBStillExists = getTouchById(
+          event.touches,
+          state.mobileLookTouchIds[1]
         );
 
-        if (!scratchedItem) {
-          return;
-        }
-
-        if (state.scratchItemId === scratchedItem.id) return;
-
-        await startScratchPlayback(scratchedItem);
-
-        function onTouchEnd(event) {
-          /*
-            문지르기 손가락이 끝나면 오디오 정지
-          */
-          const scratchEnded = Array.from(event.changedTouches).some(
-            (touch) => touch.identifier === state.mobileScratchTouchId
-          );
-
-          if (scratchEnded) {
-            resetMobileScratchState();
-            resetScratchStroke();
-            pauseScratchPlayback();
-          }
-
-          /*
-            두 손가락 드래그 중 하나라도 끝나면 시점 이동 종료
-          */
-          if (state.mobileLookTouchIds.length === 2) {
-            const touchAStillExists = getTouchById(
-              event.touches,
-              state.mobileLookTouchIds[0]
-            );
-            const touchBStillExists = getTouchById(
-              event.touches,
-              state.mobileLookTouchIds[1]
-            );
-
-            if (!touchAStillExists || !touchBStillExists) {
-              stopMobileLookDrag();
-            }
-          }
-        }
-
-        window.addEventListener("touchstart", onTouchStart, { passive: false });
-        window.addEventListener("touchmove", onTouchMove, { passive: false });
-        window.addEventListener("touchend", onTouchEnd, { passive: false });
-        window.addEventListener("touchcancel", onTouchEnd, { passive: false });
-      }
-
-      async function startScratchPlayback(item) {
-        if (!item || item.isDecorative || !item.audio) return;
-
-        state.selectedId = item.id;
-        state.iconActivatedMap.set(item.id, true);
-
-        if (state.currentPlayingId && state.currentPlayingId !== item.id) {
-          const previousItem = state.itemMap.get(state.currentPlayingId);
-          if (previousItem) {
-            pauseScratchPlayback(previousItem.id);
-          }
-        }
-
-        const audio = getOrCreateAudio(item);
-
-        try {
-          await audio.play();
-
-          state.currentPlayingId = item.id;
-          state.scratchItemId = item.id;
-          state.audioStateMap.set(item.id, "playing");
-          updateIcon(item.id, "playing");
-          document.body.classList.add("is-scratching");
-        } catch (error) {
-          console.error("스크래치 재생 실패:", item.id, item.audio, error);
+        if (!touchAStillExists || !touchBStillExists) {
+          stopMobileLookDrag();
         }
       }
+    }
 
-      function pauseScratchPlayback(itemId = state.scratchItemId) {
-        if (!itemId) return;
+    window.addEventListener("touchstart", onTouchStart, { passive: false });
+    window.addEventListener("touchmove", onTouchMove, { passive: false });
+    window.addEventListener("touchend", onTouchEnd, { passive: false });
+    window.addEventListener("touchcancel", onTouchEnd, { passive: false });
+  }
 
-        const item = state.itemMap.get(itemId);
-        const audio = state.audioMap.get(itemId);
+  async function startScratchPlayback(item) {
+    if (!item || item.isDecorative || !item.audio) return;
 
-        /*
-          진짜 stop이 아니라 pause만 한다.
-          currentTime = 0 은 절대 하지 않는다.
-        */
-        if (audio) {
-          audio.pause();
-        }
+    state.selectedId = item.id;
+    state.iconActivatedMap.set(item.id, true);
 
-        if (item) {
-          state.audioStateMap.set(itemId, "paused");
-          updateIcon(itemId, "paused");
-        }
+    if (state.currentPlayingId && state.currentPlayingId !== item.id) {
+      const previousItem = state.itemMap.get(state.currentPlayingId);
+      if (previousItem) {
+        pauseScratchPlayback(previousItem.id);
+      }
+    }
 
-        if (state.currentPlayingId === itemId) {
-          state.currentPlayingId = null;
-        }
+    const audio = getOrCreateAudio(item);
 
-        if (state.scratchItemId === itemId) {
-          state.scratchItemId = null;
-        }
+    try {
+      await audio.play();
 
-        document.body.classList.remove("is-scratching");
-        resetScratchStroke();
+      state.currentPlayingId = item.id;
+      state.scratchItemId = item.id;
+      state.audioStateMap.set(item.id, "playing");
+      updateIcon(item.id, "playing");
+      document.body.classList.add("is-scratching");
+    } catch (error) {
+      console.error("스크래치 재생 실패:", item.id, item.audio, error);
+    }
+  }
 
+  function pauseScratchPlayback(itemId = state.scratchItemId) {
+    if (!itemId) return;
+
+    const item = state.itemMap.get(itemId);
+    const audio = state.audioMap.get(itemId);
+
+    /*
+      진짜 stop이 아니라 pause만 한다.
+      currentTime = 0 은 절대 하지 않는다.
+    */
+    if (audio) {
+      audio.pause();
+    }
+
+    if (item) {
+      state.audioStateMap.set(itemId, "paused");
+      updateIcon(itemId, "paused");
+    }
+
+    if (state.currentPlayingId === itemId) {
+      state.currentPlayingId = null;
+    }
+
+    if (state.scratchItemId === itemId) {
+      state.scratchItemId = null;
+    }
+
+    document.body.classList.remove("is-scratching");
+    resetScratchStroke();
+
+  }
+
+  function setupScratchIntro() {
+    if (!introScratchBox || !introPosterImage || !scratchCanvas) return;
+
+    const ctx = scratchCanvas.getContext("2d", { willReadFrequently: true });
+    if (!ctx) return;
+
+    let isPointerDown = false;
+    let hasMovedWhileDown = false;
+    let lastPoint = null;
+    let wasRevealedOnPointerDown = false;
+
+    function resizeScratchCanvas() {
+      const rect = introScratchBox.getBoundingClientRect();
+      const dpr = window.devicePixelRatio || 1;
+
+      scratchCanvas.width = Math.floor(rect.width * dpr);
+      scratchCanvas.height = Math.floor(rect.height * dpr);
+
+      scratchCanvas.style.width = `${rect.width}px`;
+      scratchCanvas.style.height = `${rect.height}px`;
+
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.scale(dpr, dpr);
+
+      /*
+   처음에는 회색 단면으로 덮는다
+ */
+      drawScratchCover(ctx, rect.width, rect.height);
+
+    }
+
+    function getLocalPoint(event) {
+      const rect = scratchCanvas.getBoundingClientRect();
+
+      let clientX = 0;
+      let clientY = 0;
+
+      if (event.touches && event.touches.length > 0) {
+        clientX = event.touches[0].clientX;
+        clientY = event.touches[0].clientY;
+      } else if (event.changedTouches && event.changedTouches.length > 0) {
+        clientX = event.changedTouches[0].clientX;
+        clientY = event.changedTouches[0].clientY;
+      } else {
+        clientX = event.clientX;
+        clientY = event.clientY;
       }
 
-      function setupScratchIntro() {
-        if (!introScratchBox || !introPosterImage || !scratchCanvas) return;
+      return {
+        x: clientX - rect.left,
+        y: clientY - rect.top
+      };
+    }
 
-        const ctx = scratchCanvas.getContext("2d", { willReadFrequently: true });
-        if (!ctx) return;
+    function scratchAt(point) {
+      if (!point) return;
 
-        let isPointerDown = false;
-        let hasMovedWhileDown = false;
-        let lastPoint = null;
-        let wasRevealedOnPointerDown = false;
+      ctx.globalCompositeOperation = "destination-out";
+      ctx.lineCap = "round";
+      ctx.lineJoin = "round";
+      ctx.strokeStyle = "#000";
+      ctx.fillStyle = "#000";
+      ctx.lineWidth = scratchBrushSize;
 
-        function resizeScratchCanvas() {
-          const rect = introScratchBox.getBoundingClientRect();
-          const dpr = window.devicePixelRatio || 1;
-
-          scratchCanvas.width = Math.floor(rect.width * dpr);
-          scratchCanvas.height = Math.floor(rect.height * dpr);
-
-          scratchCanvas.style.width = `${rect.width}px`;
-          scratchCanvas.style.height = `${rect.height}px`;
-
-          ctx.setTransform(1, 0, 0, 1, 0, 0);
-          ctx.scale(dpr, dpr);
-
-          /*
-       처음에는 회색 단면으로 덮는다
-     */
-          drawScratchCover(ctx, rect.width, rect.height);
-
-        }
-
-        function getLocalPoint(event) {
-          const rect = scratchCanvas.getBoundingClientRect();
-
-          let clientX = 0;
-          let clientY = 0;
-
-          if (event.touches && event.touches.length > 0) {
-            clientX = event.touches[0].clientX;
-            clientY = event.touches[0].clientY;
-          } else if (event.changedTouches && event.changedTouches.length > 0) {
-            clientX = event.changedTouches[0].clientX;
-            clientY = event.changedTouches[0].clientY;
-          } else {
-            clientX = event.clientX;
-            clientY = event.clientY;
-          }
-
-          return {
-            x: clientX - rect.left,
-            y: clientY - rect.top
-          };
-        }
-
-        function scratchAt(point) {
-          if (!point) return;
-
-          ctx.globalCompositeOperation = "destination-out";
-          ctx.lineCap = "round";
-          ctx.lineJoin = "round";
-          ctx.strokeStyle = "#000";
-          ctx.fillStyle = "#000";
-          ctx.lineWidth = scratchBrushSize;
-
-          if (lastPoint) {
-            ctx.beginPath();
-            ctx.moveTo(lastPoint.x, lastPoint.y);
-            ctx.lineTo(point.x, point.y);
-            ctx.stroke();
-          }
-
-          ctx.beginPath();
-          ctx.arc(point.x, point.y, scratchBrushRadius, 0, Math.PI * 2);
-          ctx.fill();
-        }
-
-        function isRevealedAt(point) {
-          const dpr = window.devicePixelRatio || 1;
-          const x = Math.floor(point.x * dpr);
-          const y = Math.floor(point.y * dpr);
-          const pixel = ctx.getImageData(x, y, 1, 1).data;
-
-          return pixel[3] < 30;
-        }
-
-        function onPointerDown(event) {
-          event.preventDefault();
-
-          const point = getLocalPoint(event);
-
-          wasRevealedOnPointerDown = isRevealedAt(point);
-          isPointerDown = true;
-          hasMovedWhileDown = false;
-          lastPoint = point;
-
-          document.body.classList.add("is-scratching");
-
-          scratchAt(point);
-        }
-
-        function onPointerMove(event) {
-          if (!isPointerDown) return;
-          event.preventDefault();
-
-          const point = getLocalPoint(event);
-          hasMovedWhileDown = true;
-          scratchAt(point);
-          lastPoint = point;
-        }
-
-        function onPointerUp(event) {
-          if (!isPointerDown) return;
-          event.preventDefault();
-
-          const point = getLocalPoint(event);
-
-          if (!hasMovedWhileDown && wasRevealedOnPointerDown) {
-            enterSpace();
-          }
-
-          isPointerDown = false;
-          hasMovedWhileDown = false;
-          lastPoint = null;
-          wasRevealedOnPointerDown = false;
-
-          document.body.classList.remove("is-scratching");
-        }
-
-        if (introPosterImage.complete) {
-          resizeScratchCanvas();
-        } else {
-          introPosterImage.addEventListener("load", resizeScratchCanvas, { once: true });
-        }
-
-        window.addEventListener("resize", resizeScratchCanvas);
-
-        scratchCanvas.addEventListener("mousedown", onPointerDown);
-        window.addEventListener("mousemove", onPointerMove);
-        window.addEventListener("mouseup", onPointerUp);
-
-        scratchCanvas.addEventListener("touchstart", onPointerDown, { passive: false });
-        window.addEventListener("touchmove", onPointerMove, { passive: false });
-        window.addEventListener("touchend", onPointerUp, { passive: false });
-        window.addEventListener("blur", () => {
-          isPointerDown = false;
-          hasMovedWhileDown = false;
-          lastPoint = null;
-          wasRevealedOnPointerDown = false;
-          document.body.classList.remove("is-scratching");
-        });
-
-        scratchCanvas.addEventListener("mouseleave", () => {
-          if (!isPointerDown) return;
-          document.body.classList.remove("is-scratching");
-        });
+      if (lastPoint) {
+        ctx.beginPath();
+        ctx.moveTo(lastPoint.x, lastPoint.y);
+        ctx.lineTo(point.x, point.y);
+        ctx.stroke();
       }
+
+      ctx.beginPath();
+      ctx.arc(point.x, point.y, scratchBrushRadius, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    function isRevealedAt(point) {
+      const dpr = window.devicePixelRatio || 1;
+      const x = Math.floor(point.x * dpr);
+      const y = Math.floor(point.y * dpr);
+      const pixel = ctx.getImageData(x, y, 1, 1).data;
+
+      return pixel[3] < 30;
+    }
+
+    function onPointerDown(event) {
+      event.preventDefault();
+
+      const point = getLocalPoint(event);
+
+      wasRevealedOnPointerDown = isRevealedAt(point);
+      isPointerDown = true;
+      hasMovedWhileDown = false;
+      lastPoint = point;
+
+      document.body.classList.add("is-scratching");
+
+      scratchAt(point);
+    }
+
+    function onPointerMove(event) {
+      if (!isPointerDown) return;
+      event.preventDefault();
+
+      const point = getLocalPoint(event);
+      hasMovedWhileDown = true;
+      scratchAt(point);
+      lastPoint = point;
+    }
+
+    function onPointerUp(event) {
+      if (!isPointerDown) return;
+      event.preventDefault();
+
+      const point = getLocalPoint(event);
+
+      if (!hasMovedWhileDown && wasRevealedOnPointerDown) {
+        enterSpace();
+      }
+
+      isPointerDown = false;
+      hasMovedWhileDown = false;
+      lastPoint = null;
+      wasRevealedOnPointerDown = false;
+
+      document.body.classList.remove("is-scratching");
+    }
+
+    if (introPosterImage.complete) {
+      resizeScratchCanvas();
+    } else {
+      introPosterImage.addEventListener("load", resizeScratchCanvas, { once: true });
+    }
+
+    window.addEventListener("resize", resizeScratchCanvas);
+
+    scratchCanvas.addEventListener("mousedown", onPointerDown);
+    window.addEventListener("mousemove", onPointerMove);
+    window.addEventListener("mouseup", onPointerUp);
+
+    scratchCanvas.addEventListener("touchstart", onPointerDown, { passive: false });
+    window.addEventListener("touchmove", onPointerMove, { passive: false });
+    window.addEventListener("touchend", onPointerUp, { passive: false });
+    window.addEventListener("blur", () => {
+      isPointerDown = false;
+      hasMovedWhileDown = false;
+      lastPoint = null;
+      wasRevealedOnPointerDown = false;
+      document.body.classList.remove("is-scratching");
     });
+
+    scratchCanvas.addEventListener("mouseleave", () => {
+      if (!isPointerDown) return;
+      document.body.classList.remove("is-scratching");
+    });
+  }
+});
