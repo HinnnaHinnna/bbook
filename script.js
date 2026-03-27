@@ -1018,6 +1018,7 @@ document.addEventListener("DOMContentLoaded", () => {
       return scene?.canvas || scene?.querySelector?.("canvas") || null;
     }
 
+
     function getTouchById(touchList, id) {
       for (const touch of touchList) {
         if (touch.identifier === id) return touch;
