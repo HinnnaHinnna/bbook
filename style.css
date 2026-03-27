@@ -80,7 +80,24 @@ body {
   user-select: none;
   -webkit-user-select: none;
   overflow: hidden;
-  /* 포스터 박스 안에서만 보이게 */
+}
+
+.intro-poster-image {
+  display: block;
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.18));
+  pointer-events: none;
+}
+
+.scratch-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  touch-action: none;
 }
 
 .intro-marquee {
@@ -94,7 +111,6 @@ body {
   background: rgba(255, 255, 255, 0);
   z-index: 3;
   pointer-events: none;
-  /* 클릭 방해 안 하게 */
 }
 
 .intro-marquee__track {
