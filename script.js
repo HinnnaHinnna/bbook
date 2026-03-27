@@ -247,7 +247,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   window.addEventListener("blur", () => {
     stopAllMovement();
-    resetMobileTouchState();
+    window.resetMobileTouchState?.();
     pauseScratchPlayback();
     document.body.classList.remove("is-view-dragging");
     document.body.classList.remove("is-scratching");
@@ -256,7 +256,7 @@ document.addEventListener("DOMContentLoaded", () => {
   document.addEventListener("visibilitychange", () => {
     if (document.hidden) {
       stopAllMovement();
-      resetMobileTouchState();
+      window.resetMobileTouchState?.();
       pauseScratchPlayback();
       document.body.classList.remove("is-view-dragging");
       document.body.classList.remove("is-scratching");
@@ -1618,16 +1618,8 @@ document.addEventListener("DOMContentLoaded", () => {
     let isPointerDown = false;
     let lastPoint = null;
     let downPoint = null;
-
-    /*
-      포인터를 누른 순간,
-      그 지점이 이미 드러나 있었는지 저장
-    */
     let revealedBeforeDown = false;
 
-    /*
-      살짝 흔들린 정도는 클릭으로 인정
-    */
     const enterTapThreshold = 10;
 
     function resizeScratchCanvas() {
@@ -1643,9 +1635,6 @@ document.addEventListener("DOMContentLoaded", () => {
       ctx.setTransform(1, 0, 0, 1, 0, 0);
       ctx.scale(dpr, dpr);
 
-      /*
-        처음에는 단면 색으로 덮는다
-      */
       drawScratchCover(ctx, rect.width, rect.height);
     }
 
@@ -1713,16 +1702,14 @@ document.addEventListener("DOMContentLoaded", () => {
       lastPoint = point;
 
       /*
-        누르기 직전 상태를 먼저 저장
-        이 값이 true일 때만 '입장 클릭' 가능
+        누르기 직전부터 이미 드러나 있었는지 기록
       */
       revealedBeforeDown = isRevealedAt(point);
 
       document.body.classList.add("is-scratching");
 
       /*
-        이미 드러난 곳을 클릭한 경우에는
-        새로 긁지 않는다.
+        아직 가려진 부분일 때만 긁기 시작
       */
       if (!revealedBeforeDown) {
         scratchAt(point);
@@ -1749,10 +1736,10 @@ document.addEventListener("DOMContentLoaded", () => {
         : Infinity;
 
       /*
-        누른 순간 이미 드러나 있던 부분을
-        거의 움직이지 않고 탭했을 때만 입장
+        누르기 전부터 이미 드러난 부분을
+        거의 안 움직이고 탭했을 때만 입장
       */
-      if (movedDistance <= enterTapThreshold && revealedBeforeDown) {
+      if (revealedBeforeDown && movedDistance <= enterTapThreshold) {
         enterSpace();
       }
 
