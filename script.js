@@ -208,7 +208,7 @@ document.addEventListener("DOMContentLoaded", () => {
   window.addEventListener("blur", () => {
     stopAllMovement();
     resetMobileTouchState();
-    stopScratchPlayback();
+    pauseScratchPlayback();
     document.body.classList.remove("is-view-dragging");
     document.body.classList.remove("is-scratching");
   });
@@ -217,7 +217,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (document.hidden) {
       stopAllMovement();
       resetMobileTouchState();
-      stopScratchPlayback();
+      pauseScratchPlayback();
       document.body.classList.remove("is-view-dragging");
       document.body.classList.remove("is-scratching");
     }
@@ -324,15 +324,6 @@ document.addEventListener("DOMContentLoaded", () => {
           */
           if (!state.isTouchDevice && state.isLeftMouseDown) {
             await startScratchPlayback(item);
-          }
-        });
-
-        hitbox.addEventListener("mouseleave", () => {
-          /*
-            긁다가 영역을 벗어나면 정지
-          */
-          if (!state.isTouchDevice && state.scratchItemId === item.id) {
-            stopScratchPlayback(item.id);
           }
         });
 
@@ -1000,7 +991,7 @@ document.addEventListener("DOMContentLoaded", () => {
     window.addEventListener("mouseup", (event) => {
       if (event.button === 0) {
         state.isLeftMouseDown = false;
-        stopScratchPlayback();
+        pauseScratchPlayback();
       }
 
       if (event.button === 2) {
@@ -1014,7 +1005,7 @@ document.addEventListener("DOMContentLoaded", () => {
       state.isRightDragging = false;
       document.body.classList.remove("is-view-dragging");
       document.body.classList.remove("is-scratching");
-      stopScratchPlayback();
+      pauseScratchPlayback();
     });
   }
 
@@ -1051,7 +1042,6 @@ document.addEventListener("DOMContentLoaded", () => {
     function startMobileLookDrag(touches) {
       if (touches.length < 2) return;
 
-      stopScratchPlayback();
       state.mobileScratchTouchId = null;
       state.mobileScratchMoved = false;
 
@@ -1247,10 +1237,11 @@ document.addEventListener("DOMContentLoaded", () => {
       const currentItem = getItemFromClientPoint(touch.clientX, touch.clientY);
 
       /*
-        책등 밖이면 정지
-      */
+  손가락이 잠깐 책등 밖으로 벗어나도
+  바로 pause하지 않는다.
+  그냥 이번 move만 무시한다.
+*/
       if (!currentItem) {
-        stopScratchPlayback();
         return;
       }
 
@@ -1275,7 +1266,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       if (scratchEnded) {
         resetMobileScratchState();
-        stopScratchPlayback();
+        pauseScratchPlayback();
       }
 
       /*
@@ -1312,7 +1303,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (state.currentPlayingId && state.currentPlayingId !== item.id) {
       const previousItem = state.itemMap.get(state.currentPlayingId);
       if (previousItem) {
-        stopScratchPlayback(previousItem.id);
+        pauseScratchPlayback(previousItem.id);
       }
     }
 
@@ -1331,12 +1322,16 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  function stopScratchPlayback(itemId = state.scratchItemId) {
+  function pauseScratchPlayback(itemId = state.scratchItemId) {
     if (!itemId) return;
 
     const item = state.itemMap.get(itemId);
     const audio = state.audioMap.get(itemId);
 
+    /*
+      진짜 stop이 아니라 pause만 한다.
+      currentTime = 0 은 절대 하지 않는다.
+    */
     if (audio) {
       audio.pause();
     }
@@ -1353,6 +1348,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (state.scratchItemId === itemId) {
       state.scratchItemId = null;
     }
+
     document.body.classList.remove("is-scratching");
   }
 
