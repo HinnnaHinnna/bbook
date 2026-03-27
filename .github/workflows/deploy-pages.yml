@@ -1,0 +1,80 @@
+name: Deploy static site to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Show push info
+        run: |
+          echo "Actor: $GITHUB_ACTOR"
+          echo "Repository: $GITHUB_REPOSITORY"
+          echo "Branch/Ref: $GITHUB_REF"
+          echo "Commit SHA: $GITHUB_SHA"
+
+      - name: Show repository files
+        run: |
+          echo "===== repository root ====="
+          ls -la
+          echo "===== recursive file list ====="
+          find . -maxdepth 3 -type f | sort
+
+      - name: Prepare static site files
+        run: |
+          mkdir -p dist
+          cp index.html dist/ || true
+          cp style.css dist/ || true
+          cp script.js dist/ || true
+          cp projects-data.js dist/ || true
+
+          if [ -d assets ]; then
+            cp -R assets dist/assets
+          fi
+
+          touch dist/.nojekyll
+
+      - name: Show dist files
+        run: |
+          echo "===== dist file list ====="
+          find dist -maxdepth 5 -type f | sort
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: ./dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
