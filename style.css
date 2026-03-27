@@ -1,0 +1,333 @@
+@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css");
+
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  font-family: "Pretendard Variable", "Pretendard", sans-serif;
+  font-weight: 400;
+}
+
+body {
+  background: linear-gradient(to top,
+      #c9c9c9 0%,
+      #f1f1f1 35%,
+      #ececec 70%,
+      #6c6b6b 100%);
+  color: #111;
+}
+
+#scene {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+/* =========================
+   시작 화면
+========================= */
+.intro-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0px;
+  /* background: linear-gradient(to top,
+      rgba(207, 207, 207, 0.96) 0%,
+      rgba(141, 141, 141, 0.93) 45%,
+      rgba(137, 136, 136, 0.94) 100%); */
+  backdrop-filter: blur(20px);
+}
+
+.intro-overlay.is-hidden {
+  display: none;
+}
+
+.intro-hero {
+  width: min(96vw, 500px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+}
+
+.intro-scratch-box {
+  position: relative;
+  width: min(92vw, 300px);
+  max-width: 100%;
+  display: block;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.intro-poster-image {
+  display: block;
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.18));
+  pointer-events: none;
+}
+
+.scratch-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  touch-action: none;
+}
+
+/*
+  마퀴 바
+*/
+.intro-marquee {
+  width: min(92vw, 400px);
+  max-width: 100%;
+  overflow: hidden;
+  background: rgb(255, 255, 255, 0);
+  /* backdrop-filter: blur(15px); */
+}
+
+.intro-marquee__track {
+  display: flex;
+  width: max-content;
+  gap: 56px;
+  padding: 0px 0;
+  animation: intro-marquee-move 12s linear infinite;
+}
+
+.intro-marquee__track span {
+  white-space: nowrap;
+  font-size: 15px;
+  line-height: 1.4;
+  color: #000000;
+  font-weight: 450;
+  letter-spacing: 0.01em;
+}
+
+@keyframes intro-marquee-move {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@media (max-width: 768px) {
+  .intro-hero {
+    gap: 10px;
+  }
+
+  .intro-scratch-box {
+    width: min(78vw, 420px);
+  }
+
+  .intro-marquee {
+    width: 100vw;
+    max-width: none;
+    margin-left: calc(50% - 50vw);
+    margin-right: calc(50% - 50vw);
+    padding: 0;
+  }
+
+  .intro-marquee__track {
+    padding: 0;
+  }
+
+  .intro-marquee__track span {
+    font-size: 15px;
+  }
+}
+
+/* =========================
+   상단 UI
+========================= */
+.top-ui {
+  position: fixed;
+  top: 18px;
+  left: 18px;
+  right: 18px;
+  z-index: 10;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  pointer-events: none;
+}
+
+.top-ui__left,
+.top-ui__right {
+  pointer-events: auto;
+}
+
+.top-ui__right {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.guide-text {
+  margin: 4px 0 0;
+  font-size: 15px;
+  font-weight: 350;
+  line-height: 1.45;
+  color: #dfdfdf;
+
+  white-space: normal;
+  word-break: keep-all;
+  overflow-wrap: normal;
+
+}
+
+.mini-label {
+  margin: 0;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  color: #6f8797;
+}
+
+.ghost-btn {
+  padding: 7px 10px 5px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.15);
+  color: #dfdfdf;
+  border: 0.5px solid rgba(255, 255, 255, 0.5);
+  box-shadow: 0 10px 25px rgba(89, 136, 167, 0.1);
+  font-size: 12px;
+  font-weight: 500;
+
+  white-space: nowrap;
+  word-break: normal;
+}
+
+
+.sound-status {
+  margin: 10px 0 0;
+  font-size: 13px;
+  font-weight: 500;
+  color: #4f7187;
+}
+
+/* =========================
+   모바일 이동 버튼
+========================= */
+.mobile-controls {
+  position: fixed;
+  right: 18px;
+  bottom: 18px;
+  z-index: 12;
+  width: 180px;
+  height: 180px;
+  pointer-events: none;
+}
+
+.move-btn {
+  position: absolute;
+  width: 64px;
+  height: 64px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.8);
+  color: #111;
+  font-size: 24px;
+  font-weight: 700;
+  border: none;
+  outline: none;
+  box-shadow: 0 5px 5px rgba(86, 86, 86, 0.15);
+  pointer-events: auto;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.move-btn--up {
+  left: 58px;
+  top: 0;
+}
+
+.move-btn--left {
+  left: 0;
+  top: 58px;
+}
+
+.move-btn--right {
+  right: 0;
+  top: 58px;
+}
+
+.move-btn--down {
+  left: 58px;
+  bottom: 0;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .mobile-controls {
+    display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .intro-hero {
+    gap: 10px;
+  }
+
+  .intro-scratch-box {
+    width: min(78vw, 420px);
+  }
+
+  .intro-marquee {
+    width: 100vw;
+    max-width: none;
+    margin-left: calc(50% - 50vw);
+    margin-right: calc(50% - 50vw);
+    padding: 0;
+  }
+
+  .intro-marquee__track {
+    padding: 0;
+  }
+
+  .intro-marquee__track span {
+    font-size: 15px;
+  }
+}
+
+/* 기본 상태: 열린 손 */
+.a-canvas,
+.a-canvas:hover,
+.scratch-canvas,
+.scratch-canvas:hover,
+.intro-overlay,
+.intro-overlay * {
+  cursor: grab !important;
+  cursor: -webkit-grab !important;
+  cursor: -moz-grab !important;
+}
+
+/* 긁는 중: 움켜쥔 손 */
+body.is-scratching .a-canvas,
+body.is-scratching .a-canvas:hover,
+body.is-scratching .scratch-canvas,
+body.is-scratching .scratch-canvas:hover,
+body.is-scratching .intro-overlay,
+body.is-scratching .intro-overlay * {
+  cursor: grabbing !important;
+  cursor: -webkit-grabbing !important;
+  cursor: -moz-grabbing !important;
+}
