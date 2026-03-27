@@ -634,6 +634,10 @@ document.addEventListener("DOMContentLoaded", () => {
         await sharedAudioContext.resume();
       }
 
+      if (audio.ended) {
+        audio.currentTime = 0;
+      }
+
       audio.muted = false;
       await audio.play();
 
@@ -1318,7 +1322,7 @@ document.addEventListener("DOMContentLoaded", () => {
       return closestItem;
     }
 
-    function onTouchStart(event) {
+    async function onTouchStart(event) {
       if (!state.started) return;
       if (isUiTarget(event.target)) return;
 
@@ -1341,9 +1345,23 @@ document.addEventListener("DOMContentLoaded", () => {
       state.mobileScratchMoved = false;
 
       const item = getItemFromClientPoint(touch.clientX, touch.clientY);
-      if (item) {
-        unlockAudioForItem(item);
-      }
+
+      if (!item) return;
+
+      /*
+        iOS 크롬/구글 앱 대응:
+        touchstart 안에서 unlock + 실제 재생까지 바로 시도
+      */
+      event.preventDefault();
+
+      await unlockAudioForItem(item);
+
+      const scratchedItem = handleScratchAtClientPoint(
+        touch.clientX,
+        touch.clientY
+      );
+
+      await startScratchPlayback(scratchedItem || item);
     }
 
     async function onTouchMove(event) {
