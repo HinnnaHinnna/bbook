@@ -11,7 +11,7 @@
 
 window.EXHIBITION_DATA = {
   settings: {
-    spawnPosition: { x: -99, y: 0, z: 4 },
+    spawnPosition: { x: -97, y: 0, z: 4 },
 
     desktopAcceleration: 45,
     mobileMoveSpeed: 3.2,
@@ -219,7 +219,7 @@ window.EXHIBITION_DATA = {
       image: "assets/images/intro-panel-01.png",
       spineHeightMm: 11.2,
       spineWidthMm: 475,
-      xOffset: -80,
+      xOffset: -78,
       yOffset: 0,
       zOffset: 10,
       isDecorative: true

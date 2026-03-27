@@ -5,6 +5,15 @@
   box-sizing: border-box;
 }
 
+:root {
+  /* 시작 화면 + 3D 책등 덮개 색을 같이 제어 */
+  --scratch-overlay-color: #ff6ae6;
+
+  /* 시작 화면 + 3D 책등 긁기 브러시 크기 */
+  --scratch-brush-size: 42;
+}
+
+
 html,
 body {
   margin: 0;
