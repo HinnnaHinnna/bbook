@@ -331,3 +331,8 @@ body.is-scratching .intro-overlay * {
   cursor: -webkit-grabbing !important;
   cursor: -moz-grabbing !important;
 }
+
+#scene,
+.a-canvas {
+  touch-action: none;
+}

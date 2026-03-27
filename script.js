@@ -84,6 +84,15 @@ document.addEventListener("DOMContentLoaded", () => {
     lastRightDragY: 0,
     scratchItemId: null,
 
+    mobileScratchTouchId: null,
+    mobileScratchStartX: 0,
+    mobileScratchStartY: 0,
+    mobileScratchMoved: false,
+
+    mobileLookTouchIds: [],
+    mobileLookLastCenterX: 0,
+    mobileLookLastCenterY: 0,
+
     move: {
       forward: false,
       backward: false,
@@ -128,7 +137,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   camera.setAttribute(
     "look-controls",
-    "mouseEnabled: false; touchEnabled: true; pointerLockEnabled: false; magicWindowTrackingEnabled: false"
+    "mouseEnabled: false; touchEnabled: false; pointerLockEnabled: false; magicWindowTrackingEnabled: false"
   );
 
   if (!state.isTouchDevice) {
@@ -149,12 +158,13 @@ document.addEventListener("DOMContentLoaded", () => {
     introOverlay.classList.add("is-hidden");
 
     guideText.innerHTML = state.isTouchDevice
-      ? "W A S D 또는 화살표 키로 이동하세요. 마우스 오른쪽 버튼을 누르면서 드래그하면 시점이 바뀝니다. 마우스 왼쪽 버튼을 누르면서 책등을 긁을 때만 서평을 들을 수 있습니다."
+      ? "화면 오른쪽 하단 화살표 버튼으로 이동하세요. 손가락 두개로 드래그하면 시점이 바뀝니다. 손가락 한개로 책등을 긁을 때만 서평을 들을 수 있습니다."
       : "W A S D 또는 화살표 키로 이동하세요. 마우스 오른쪽 버튼을 누르면서 드래그하면 시점이 바뀝니다. 마우스 왼쪽 버튼을 누르면서 책등을 긁을 때만 서평을 들을 수 있습니다.";
   }
 
   setupScratchIntro();
   setupDesktopInteraction();
+  setupMobileTouchInteraction();
 
   resetPositionButton.addEventListener("click", () => {
     resetPlayerPosition();
@@ -194,11 +204,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
   window.addEventListener("blur", () => {
     stopAllMovement();
+    resetMobileTouchState();
+    stopScratchPlayback();
+    document.body.classList.remove("is-view-dragging");
+    document.body.classList.remove("is-scratching");
   });
 
   document.addEventListener("visibilitychange", () => {
     if (document.hidden) {
       stopAllMovement();
+      resetMobileTouchState();
+      stopScratchPlayback();
+      document.body.classList.remove("is-view-dragging");
+      document.body.classList.remove("is-scratching");
     }
   });
 
@@ -333,14 +351,7 @@ document.addEventListener("DOMContentLoaded", () => {
           await startScratchPlayback(item);
         });
 
-        /*
-          모바일에서는 기존처럼 탭 재생 유지
-        */
-        if (state.isTouchDevice) {
-          hitbox.addEventListener("click", async () => {
-            await handleSpineClick(item);
-          });
-        }
+        item.hitboxRef = hitbox;
 
         visualGroup.appendChild(hitbox);
         group.appendChild(iconText);
@@ -401,20 +412,15 @@ document.addEventListener("DOMContentLoaded", () => {
         z: item.rotationZ ?? 0
       },
 
-      /*
-        현재 네 projects-data.js는 이 오프셋 방식을 쓰고 있음
-      */
       xOffset: item.xOffset ?? 0,
       yOffset: item.yOffset ?? 0,
       zOffset: item.zOffset ?? 0,
 
-      /*
-        장식 이미지 여부
-      */
       isDecorative: item.isDecorative ?? false,
 
       groupRef: null,
-      visualRef: null
+      visualRef: null,
+      hitboxRef: null
     };
   }
 
@@ -1007,6 +1013,265 @@ document.addEventListener("DOMContentLoaded", () => {
       document.body.classList.remove("is-scratching");
       stopScratchPlayback();
     });
+  }
+
+  function setupMobileTouchInteraction() {
+    if (!state.isTouchDevice) return;
+
+    const scratchMoveThreshold = 10;
+
+    function getSceneCanvas() {
+      return scene?.canvas || scene?.querySelector?.("canvas") || null;
+    }
+
+    function getTouchById(touchList, id) {
+      for (const touch of touchList) {
+        if (touch.identifier === id) return touch;
+      }
+      return null;
+    }
+
+    function isUiTarget(target) {
+      if (!(target instanceof Element)) return false;
+      return Boolean(
+        target.closest(".move-btn, .ghost-btn, .top-ui, .intro-overlay")
+      );
+    }
+
+    function getTouchCenter(touchA, touchB) {
+      return {
+        x: (touchA.clientX + touchB.clientX) / 2,
+        y: (touchA.clientY + touchB.clientY) / 2
+      };
+    }
+
+    function startMobileLookDrag(touches) {
+      if (touches.length < 2) return;
+
+      stopScratchPlayback();
+      state.mobileScratchTouchId = null;
+      state.mobileScratchMoved = false;
+
+      state.mobileLookTouchIds = [touches[0].identifier, touches[1].identifier];
+
+      const center = getTouchCenter(touches[0], touches[1]);
+      state.mobileLookLastCenterX = center.x;
+      state.mobileLookLastCenterY = center.y;
+
+      document.body.classList.add("is-view-dragging");
+      document.body.classList.remove("is-scratching");
+    }
+
+    function stopMobileLookDrag() {
+      state.mobileLookTouchIds = [];
+      document.body.classList.remove("is-view-dragging");
+    }
+
+    function resetMobileScratchState() {
+      state.mobileScratchTouchId = null;
+      state.mobileScratchStartX = 0;
+      state.mobileScratchStartY = 0;
+      state.mobileScratchMoved = false;
+    }
+
+    function resetMobileTouchState() {
+      resetMobileScratchState();
+      stopMobileLookDrag();
+    }
+
+    window.resetMobileTouchState = resetMobileTouchState;
+
+    function getItemFromClientPoint(clientX, clientY) {
+      const canvas = getSceneCanvas();
+      const threeCamera = camera.getObject3D("camera");
+
+      if (!canvas || !threeCamera) return null;
+
+      const rect = canvas.getBoundingClientRect();
+
+      if (
+        clientX < rect.left ||
+        clientX > rect.right ||
+        clientY < rect.top ||
+        clientY > rect.bottom
+      ) {
+        return null;
+      }
+
+      const ndc = new THREE.Vector2(
+        ((clientX - rect.left) / rect.width) * 2 - 1,
+        -((clientY - rect.top) / rect.height) * 2 + 1
+      );
+
+      const raycaster = new THREE.Raycaster();
+      raycaster.setFromCamera(ndc, threeCamera);
+
+      let closestItem = null;
+      let closestDistance = Infinity;
+
+      state.itemMap.forEach((item) => {
+        if (item.isDecorative || !item.hitboxRef) return;
+
+        const intersections = raycaster.intersectObject(
+          item.hitboxRef.object3D,
+          true
+        );
+
+        if (!intersections.length) return;
+
+        const hit = intersections[0];
+        if (hit.distance < closestDistance) {
+          closestDistance = hit.distance;
+          closestItem = item;
+        }
+      });
+
+      return closestItem;
+    }
+
+    async function onTouchStart(event) {
+      if (!state.started) return;
+      if (isUiTarget(event.target)) return;
+
+      if (event.touches.length >= 2) {
+        event.preventDefault();
+        startMobileLookDrag(event.touches);
+        return;
+      }
+
+      if (event.touches.length !== 1) return;
+
+      const touch = event.changedTouches[0];
+      if (!touch) return;
+
+      stopMobileLookDrag();
+
+      state.mobileScratchTouchId = touch.identifier;
+      state.mobileScratchStartX = touch.clientX;
+      state.mobileScratchStartY = touch.clientY;
+      state.mobileScratchMoved = false;
+    }
+
+    async function onTouchMove(event) {
+      if (!state.started) return;
+
+      /*
+        1) 두 손가락일 때는 시점 이동
+      */
+      if (state.mobileLookTouchIds.length === 2) {
+        const touchA = getTouchById(event.touches, state.mobileLookTouchIds[0]);
+        const touchB = getTouchById(event.touches, state.mobileLookTouchIds[1]);
+
+        if (touchA && touchB) {
+          event.preventDefault();
+
+          const lookControls = camera.components["look-controls"];
+          if (!lookControls) return;
+
+          const center = getTouchCenter(touchA, touchB);
+          const dx = center.x - state.mobileLookLastCenterX;
+          const dy = center.y - state.mobileLookLastCenterY;
+
+          state.mobileLookLastCenterX = center.x;
+          state.mobileLookLastCenterY = center.y;
+
+          const yawSpeed = 0.0045;
+          const pitchSpeed = 0.0035;
+
+          lookControls.yawObject.rotation.y -= dx * yawSpeed;
+          lookControls.pitchObject.rotation.x -= dy * pitchSpeed;
+
+          const maxPitch = Math.PI / 2 - 0.05;
+          const minPitch = -Math.PI / 2 + 0.05;
+
+          lookControls.pitchObject.rotation.x = Math.max(
+            minPitch,
+            Math.min(maxPitch, lookControls.pitchObject.rotation.x)
+          );
+        }
+
+        return;
+      }
+
+      /*
+        2) 한 손가락일 때는 '문지르기' 오디오
+      */
+      if (state.mobileScratchTouchId === null) return;
+      if (event.touches.length !== 1) return;
+
+      const touch = getTouchById(event.touches, state.mobileScratchTouchId);
+      if (!touch) return;
+
+      const movedDistance = Math.hypot(
+        touch.clientX - state.mobileScratchStartX,
+        touch.clientY - state.mobileScratchStartY
+      );
+
+      /*
+        살짝 탭한 정도는 무시
+      */
+      if (movedDistance < scratchMoveThreshold) return;
+
+      event.preventDefault();
+      state.mobileScratchMoved = true;
+
+      const currentItem = getItemFromClientPoint(touch.clientX, touch.clientY);
+
+      /*
+        책등 밖이면 정지
+      */
+      if (!currentItem) {
+        stopScratchPlayback();
+        return;
+      }
+
+      /*
+        같은 책등 위를 계속 문지르는 중이면 그대로 유지
+      */
+      if (state.scratchItemId === currentItem.id) return;
+
+      /*
+        다른 책등으로 넘어가면 기존 것 멈추고 새로 시작
+      */
+      await startScratchPlayback(currentItem);
+    }
+
+    function onTouchEnd(event) {
+      /*
+        문지르기 손가락이 끝나면 오디오 정지
+      */
+      const scratchEnded = Array.from(event.changedTouches).some(
+        (touch) => touch.identifier === state.mobileScratchTouchId
+      );
+
+      if (scratchEnded) {
+        resetMobileScratchState();
+        stopScratchPlayback();
+      }
+
+      /*
+        두 손가락 드래그 중 하나라도 끝나면 시점 이동 종료
+      */
+      if (state.mobileLookTouchIds.length === 2) {
+        const touchAStillExists = getTouchById(
+          event.touches,
+          state.mobileLookTouchIds[0]
+        );
+        const touchBStillExists = getTouchById(
+          event.touches,
+          state.mobileLookTouchIds[1]
+        );
+
+        if (!touchAStillExists || !touchBStillExists) {
+          stopMobileLookDrag();
+        }
+      }
+    }
+
+    window.addEventListener("touchstart", onTouchStart, { passive: false });
+    window.addEventListener("touchmove", onTouchMove, { passive: false });
+    window.addEventListener("touchend", onTouchEnd, { passive: false });
+    window.addEventListener("touchcancel", onTouchEnd, { passive: false });
   }
 
   async function startScratchPlayback(item) {
