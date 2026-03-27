@@ -6,10 +6,8 @@
 }
 
 :root {
-  /* 시작 화면 + 3D 책등 덮개 색을 같이 제어 */
   --scratch-overlay-color: #a4a4a4;
 
-  /* 시작 화면 + 3D 책등 긁기 브러시 크기 */
   --scratch-brush-size: 15;
 }
 
@@ -41,9 +39,6 @@ body {
   z-index: 1;
 }
 
-/* =========================
-   시작 화면
-========================= */
 .intro-overlay {
   position: fixed;
   inset: 0;
@@ -172,9 +167,6 @@ body {
   }
 }
 
-/* =========================
-   상단 UI
-========================= */
 .top-ui {
   position: fixed;
   top: 18px;
@@ -210,7 +202,6 @@ body {
   white-space: normal;
   word-break: keep-all;
   overflow-wrap: normal;
-
 }
 
 .mini-label {
@@ -243,9 +234,6 @@ body {
   color: #4f7187;
 }
 
-/* =========================
-   모바일 이동 버튼
-========================= */
 .mobile-controls {
   position: fixed;
   right: 18px;
@@ -326,7 +314,6 @@ body {
   }
 }
 
-/* 기본 상태: 열린 손 */
 .a-canvas,
 .a-canvas:hover,
 .scratch-canvas,
@@ -338,7 +325,6 @@ body {
   cursor: -moz-grab !important;
 }
 
-/* 긁는 중: 움켜쥔 손 */
 body.is-scratching .a-canvas,
 body.is-scratching .a-canvas:hover,
 body.is-scratching .scratch-canvas,

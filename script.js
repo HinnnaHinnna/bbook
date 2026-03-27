@@ -6,9 +6,6 @@ document.addEventListener("DOMContentLoaded", () => {
     return;
   }
 
-  /* =========================
-     DOM 참조
-  ========================= */
   const scene = document.getElementById("scene");
   const dynamicAssets = document.getElementById("dynamicAssets");
   const galleryRoot = document.getElementById("galleryRoot");
@@ -26,9 +23,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const mobileControls = document.getElementById("mobileControls");
   const moveButtons = document.querySelectorAll(".move-btn");
 
-  /* =========================
-     설정
-  ========================= */
   const settings = data.settings || {};
 
   const spawnPosition = settings.spawnPosition || { x: -10, y: 0, z: -3 };
@@ -54,10 +48,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const fadeEndDistance = settings.fadeEndDistance ?? 36;
   const fadeMinOpacity = settings.fadeMinOpacity ?? 0;
 
-  /*
-    시작 화면 / 3D 책등 덮개가 함께 쓰는 공용 설정값
-    style.css의 :root 변수에서 읽어온다.
-  */
   const rootStyles = getComputedStyle(document.documentElement);
 
   const scratchOverlayColor =
@@ -70,22 +60,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const scratchBrushRadius = scratchBrushSize / 2;
 
-  /*
-    3D 책등 덮개 캔버스 해상도 배율
-  */
   const scratchTextureScale = 4;
 
-  /*
-    오디오 증폭 설정
-  */
   const audioBoost = 2.0;
 
   let sharedAudioContext = null;
   const audioNodeMap = new Map();
 
-  /* =========================
-     상태
-  ========================= */
   const state = {
     started: false,
 
@@ -140,18 +121,12 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   };
 
-  /* =========================
-     상태 아이콘
-  ========================= */
   const AUDIO_ICONS = {
     stopped: "STOP",
     playing: "PLAY",
     paused: "PAUSE"
   };
 
-  /* =========================
-     초기 세팅
-  ========================= */
   rig.setAttribute(
     "wasd-controls",
     `acceleration: ${desktopAcceleration}; fly: false`
@@ -162,11 +137,6 @@ document.addEventListener("DOMContentLoaded", () => {
     "mouseEnabled: false; touchEnabled: false; pointerLockEnabled: false; magicWindowTrackingEnabled: false"
   );
 
-  /*
-    모바일에서는 A-Frame의 mouse cursor / raycaster를 끈다.
-    iOS Chrome에서 elementFromPoint non-finite 오류를 막기 위함.
-    데스크탑에서만 다시 켠다.
-  */
   if (!state.isTouchDevice) {
     scene.setAttribute(
       "cursor__mouse",
@@ -249,9 +219,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  /* =========================
-     이벤트
-  ========================= */
   function enterSpace() {
     state.isLeftMouseDown = false;
     state.isRightDragging = false;
@@ -272,9 +239,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  /* =========================
-     갤러리 생성
-  ========================= */
   function buildGallery() {
     galleryRoot.innerHTML = "";
     dynamicAssets.innerHTML = "";
@@ -418,9 +382,6 @@ document.addEventListener("DOMContentLoaded", () => {
     updateDistanceFade();
   }
 
-  /* =========================
-     아이템 준비
-  ========================= */
   function prepareItem(item, index) {
     const displayHeight = item.spineHeightMm * mmToWorld;
     const displayWidth = item.spineWidthMm * mmToWorld;
@@ -457,9 +418,6 @@ document.addEventListener("DOMContentLoaded", () => {
     };
   }
 
-  /* =========================
-     일렬 배치
-  ========================= */
   function updateWorldBounds(items) {
     if (items.length === 0) return;
 
@@ -505,9 +463,6 @@ document.addEventListener("DOMContentLoaded", () => {
     state.worldBounds.maxZ = worldMaxZ;
   }
 
-  /* =========================
-     이미지 asset 생성
-  ========================= */
   function createImageAsset(item) {
     const assetId = `asset-${item.id}`;
     const img = document.createElement("img");
@@ -544,9 +499,6 @@ document.addEventListener("DOMContentLoaded", () => {
     return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
   }
 
-  /* =========================
-     오디오 제어
-  ========================= */
   function getOrCreateAudio(item) {
     if (state.audioMap.has(item.id)) {
       return state.audioMap.get(item.id);
@@ -710,9 +662,6 @@ document.addEventListener("DOMContentLoaded", () => {
     resetScratchStroke();
   }
 
-  /* =========================
-     상태 아이콘
-  ========================= */
   function updateIcon(itemId, newState) {
     const iconText = state.iconTextMap.get(itemId);
     const activated = state.iconActivatedMap.get(itemId);
@@ -737,9 +686,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  /* =========================
-     바닥 크기 조절
-  ========================= */
   function applyFloorSize() {
     if (!floorPlane) return;
 
@@ -761,9 +707,6 @@ document.addEventListener("DOMContentLoaded", () => {
     state.worldBounds.maxZ = floorPosition.z + halfHeight - floorEdgePadding;
   }
 
-  /* =========================
-     거리 페이드
-  ========================= */
   function updateDistanceFade() {
     const cameraWorldPosition = new THREE.Vector3();
     camera.object3D.getWorldPosition(cameraWorldPosition);
@@ -808,9 +751,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  /* =========================
-     모바일 이동
-  ========================= */
   function setupMobileMoveButtons() {
     moveButtons.forEach((button) => {
       const direction = button.dataset.move;
@@ -894,9 +834,6 @@ document.addEventListener("DOMContentLoaded", () => {
     clampRigToBounds();
   }
 
-  /* =========================
-     위치 제어
-  ========================= */
   function setRigPosition(x, y, z) {
     rig.object3D.position.set(x, y, z);
     clampRigToBounds();
@@ -936,9 +873,6 @@ document.addEventListener("DOMContentLoaded", () => {
     camera.object3D.rotation.set(0, 0, 0);
   }
 
-  /* =========================
-     유틸리티
-  ========================= */
   function clamp(value, min, max) {
     return Math.min(Math.max(value, min), max);
   }
@@ -1140,9 +1074,6 @@ document.addEventListener("DOMContentLoaded", () => {
     return hit.item;
   }
 
-  /* =========================
-     데스크탑 인터랙션
-  ========================= */
   function setupDesktopInteraction() {
     if (state.isTouchDevice) return;
 
@@ -1234,9 +1165,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  /* =========================
-     모바일 인터랙션
-  ========================= */
   function setupMobileTouchInteraction() {
     if (!state.isTouchDevice) return;
 
@@ -1380,10 +1308,6 @@ document.addEventListener("DOMContentLoaded", () => {
       const item = getItemFromClientPoint(touch.clientX, touch.clientY);
       if (!item) return;
 
-      /*
-        iOS 크롬 / 구글 앱 대응:
-        터치 시작 순간에 바로 오디오 재생까지 시도
-      */
       event.preventDefault();
 
       const scratchedItem = handleScratchAtClientPoint(
@@ -1495,9 +1419,6 @@ document.addEventListener("DOMContentLoaded", () => {
     window.addEventListener("touchcancel", onTouchEnd, { passive: false });
   }
 
-  /* =========================
-     시작 화면 긁기
-  ========================= */
   function setupScratchIntro() {
     if (!introScratchBox || !introPosterImage || !scratchCanvas) return;
 

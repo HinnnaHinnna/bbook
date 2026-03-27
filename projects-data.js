@@ -1,14 +1,3 @@
-/*
-  ============================================
-  책등 데이터 파일
-  ============================================
-
-  이번 버전의 핵심:
-  1. 책등은 왼쪽 -> 오른쪽으로 일렬 배치
-  2. 실제 책등 세로/가로(mm) 비율 반영
-  3. 시작 위치를 더 가깝게 조정
-*/
-
 window.EXHIBITION_DATA = {
   settings: {
     spawnPosition: { x: -106, y: 0, z: 4 },
@@ -28,34 +17,11 @@ window.EXHIBITION_DATA = {
     worldMinZ: -18,
     worldMaxZ: 8,
 
-    /*
-      바닥 전체 크기
-      여기 숫자를 직접 바꾸면 돼.
-      width = 좌우 길이
-      height = 앞뒤 길이
-    */
     floorWidth: 420,
     floorHeight: 50,
-
-    /*
-      바닥 가장자리에서 얼마나 안쪽까지 이동 가능하게 할지
-      숫자가 클수록 가장자리 가까이 못 감
-    */
     floorEdgePadding: 3,
-
-    /*
-      카메라에서 얼마나 멀어지면 서서히 사라질지
-      - fadeStartDistance: 여기부터 투명해지기 시작
-      - fadeEndDistance: 여기쯤 되면 거의 안 보임
-    */
     fadeStartDistance: 18,
     fadeEndDistance: 36,
-
-    /*
-      완전히 안 보이게 할지,
-      아주 희미하게 남길지 정하는 최소 opacity
-      0이면 완전히 사라짐
-    */
     fadeMinOpacity: 0
   },
 

@@ -6,14 +6,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>한국에서 가장 아름다운 책등</title>
 
-  <!-- A-Frame -->
   <script src="https://aframe.io/releases/1.7.1/aframe.min.js"></script>
 
   <link rel="stylesheet" href="style.css?v=20260327-8" />
 </head>
 
 <body>
-  <!-- 시작 오버레이 -->
   <div id="introOverlay" class="intro-overlay">
     <div class="intro-hero">
       <div id="introScratchBox" class="intro-scratch-box" aria-label="포스터를 긁어서 드러난 부분을 클릭하면 입장">
@@ -30,7 +28,6 @@
     </div>
   </div>
 
-  <!-- 상단 UI -->
   <div class="top-ui">
     <div class="top-ui__left">
       <p class="mini-label"></p>
@@ -44,7 +41,6 @@
     </div>
   </div>
 
-  <!-- 모바일 이동 버튼 -->
   <div class="mobile-controls" id="mobileControls" aria-label="모바일 이동 버튼">
     <button class="move-btn move-btn--up" data-move="forward" type="button">↑</button>
     <button class="move-btn move-btn--left" data-move="left" type="button">←</button>
@@ -52,23 +48,18 @@
     <button class="move-btn move-btn--down" data-move="backward" type="button">↓</button>
   </div>
 
-  <!-- 3D Scene -->
   <a-scene id="scene" embedded renderer="alpha: true; antialias: true" xr-mode-ui="enabled: false"
     keyboard-shortcuts="enterVR: false; exitVR: false" fog="type: linear; color: #e5e5e5; near: 12; far: 42">
     <a-assets id="dynamicAssets"></a-assets>
 
-    <!-- 기본 조명 -->
     <a-entity light="type: ambient; intensity: 1.12; color: #ffffff"></a-entity>
     <a-entity light="type: directional; intensity: 0.42; color: #dff1ff" position="3 8 5"></a-entity>
 
-    <!-- 바닥 -->
     <a-plane id="floorPlane" position="0 0 -12" rotation="-90 0 0" width="220" height="90"
       material="shader: flat; color: #ffffff; opacity: 0.98"></a-plane>
 
-    <!-- 책등 루트 -->
     <a-entity id="galleryRoot"></a-entity>
 
-    <!-- 카메라 리그 -->
     <a-entity id="cameraRig" position="0 0 -3" wasd-controls="acceleration: 45; fly: false">
       <a-entity id="camera" camera position="0 1.6 0"
         look-controls="mouseEnabled: true; touchEnabled: true; pointerLockEnabled: false; magicWindowTrackingEnabled: false"></a-entity>
