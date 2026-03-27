@@ -714,6 +714,8 @@ document.addEventListener("DOMContentLoaded", () => {
     state.itemMap.forEach((item, itemId) => {
       const imagePlane = state.imagePlaneMap.get(itemId);
       const iconText = state.iconTextMap.get(itemId);
+      const scratchLayer = state.scratchLayerMap.get(itemId);
+      const overlayPlane = scratchLayer?.overlayPlane;
 
       if (!imagePlane || !item.groupRef) return;
 
@@ -737,7 +739,17 @@ document.addEventListener("DOMContentLoaded", () => {
       const smoothT = t * t * (3 - 2 * t);
       const opacity = 1 - smoothT * (1 - fadeMinOpacity);
 
+      /*
+        아래 실제 책등 이미지 페이드
+      */
       imagePlane.setAttribute("material", "opacity", opacity);
+
+      /*
+        위 회색 단면(긁기 덮개)도 같은 비율로 페이드
+      */
+      if (overlayPlane) {
+        overlayPlane.setAttribute("material", "opacity", opacity);
+      }
 
       const activated = state.iconActivatedMap.get(itemId);
 
