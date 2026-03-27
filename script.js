@@ -162,6 +162,25 @@ document.addEventListener("DOMContentLoaded", () => {
     "mouseEnabled: false; touchEnabled: false; pointerLockEnabled: false; magicWindowTrackingEnabled: false"
   );
 
+  /*
+    모바일에서는 A-Frame의 mouse cursor / raycaster를 끈다.
+    iOS Chrome에서 elementFromPoint non-finite 오류를 막기 위함.
+    데스크탑에서만 다시 켠다.
+  */
+  if (!state.isTouchDevice) {
+    scene.setAttribute(
+      "cursor__mouse",
+      "rayOrigin: mouse; mouseCursorStylesEnabled: false"
+    );
+    scene.setAttribute(
+      "raycaster",
+      "objects: .clickable; far: 100; interval: 100"
+    );
+  } else {
+    scene.removeAttribute("cursor__mouse");
+    scene.removeAttribute("raycaster");
+  }
+
   if (!state.isTouchDevice && mobileControls) {
     mobileControls.style.display = "none";
   }
