@@ -1320,6 +1320,10 @@ document.addEventListener("DOMContentLoaded", () => {
       const item = getItemFromClientPoint(touch.clientX, touch.clientY);
       if (!item) return;
 
+      /*
+        iOS 크롬 / 구글 앱 대응:
+        터치 시작 순간에 바로 오디오 재생까지 시도
+      */
       event.preventDefault();
 
       const scratchedItem = handleScratchAtClientPoint(
@@ -1389,9 +1393,7 @@ document.addEventListener("DOMContentLoaded", () => {
         touch.clientY
       );
 
-      if (!scratchedItem) {
-        return;
-      }
+      if (!scratchedItem) return;
 
       if (state.scratchItemId === scratchedItem.id) return;
 
