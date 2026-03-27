@@ -704,6 +704,13 @@ document.addEventListener("DOMContentLoaded", () => {
     audio.volume = 1;
 
     /*
+      모바일 브라우저에서 inline 재생 허용
+    */
+    audio.playsInline = true;
+    audio.setAttribute("playsinline", "");
+    audio.setAttribute("webkit-playsinline", "");
+
+    /*
       AudioContext는 사용자 제스처 이후에 실제 동작
     */
     if (!sharedAudioContext) {
@@ -1445,20 +1452,32 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     async function unlockAudioForItem(item) {
-      if (!item || item.isDecorative || !item.audio) return;
+      if (!item || item.isDecorative || !item.audio) return false;
 
       const audio = getOrCreateAudio(item);
 
       try {
+        /*
+          모바일에서 Web Audio Context를 먼저 깨운다
+        */
+        if (sharedAudioContext?.state === "suspended") {
+          await sharedAudioContext.resume();
+        }
+
         audio.muted = true;
         audio.currentTime = 0;
+
         await audio.play();
+
         audio.pause();
         audio.currentTime = 0;
         audio.muted = false;
+
+        return true;
       } catch (error) {
         audio.muted = false;
         console.warn("모바일 오디오 unlock 실패:", error);
+        return false;
       }
     }
 
@@ -1607,6 +1626,14 @@ document.addEventListener("DOMContentLoaded", () => {
     const audio = getOrCreateAudio(item);
 
     try {
+      /*
+        모바일에서 재생 직전에도 한 번 더 보장
+      */
+      if (sharedAudioContext?.state === "suspended") {
+        await sharedAudioContext.resume();
+      }
+
+      audio.muted = false;
       await audio.play();
 
       state.currentPlayingId = item.id;

@@ -11,7 +11,7 @@
 
 window.EXHIBITION_DATA = {
   settings: {
-    spawnPosition: { x: -97, y: 0, z: 4 },
+    spawnPosition: { x: -87, y: 0, z: 4 },
 
     desktopAcceleration: 45,
     mobileMoveSpeed: 3.2,
