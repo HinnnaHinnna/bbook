@@ -64,23 +64,17 @@ document.addEventListener("DOMContentLoaded", () => {
     rootStyles.getPropertyValue("--scratch-overlay-color").trim() || "#ff6ae6";
 
   const scratchBrushSize =
-    Number.parseFloat(
-      rootStyles.getPropertyValue("--scratch-brush-size")
-    ) || 42;
+    Number.parseFloat(rootStyles.getPropertyValue("--scratch-brush-size")) || 42;
 
   const scratchBrushRadius = scratchBrushSize / 2;
 
   /*
     3D 책등 덮개 캔버스 해상도 배율
-    너무 낮으면 긁은 자국이 거칠게 보이고,
-    너무 높으면 성능이 무거워질 수 있다.
   */
   const scratchTextureScale = 4;
 
   /*
     오디오 증폭 설정
-    1 = 원본 크기
-    1.6 ~ 2.2 정도부터 체감상 더 커짐
   */
   const audioBoost = 2.0;
 
@@ -103,14 +97,8 @@ document.addEventListener("DOMContentLoaded", () => {
     iconTextMap: new Map(),
     iconActivatedMap: new Map(),
 
-    /*
-      거리 페이드용
-    */
     imagePlaneMap: new Map(),
 
-    /*
-      3D 책등 덮개 캔버스 / 텍스처 관리
-    */
     scratchLayerMap: new Map(),
     scratchLastPoint: null,
 
@@ -122,9 +110,6 @@ document.addEventListener("DOMContentLoaded", () => {
     lastRightDragY: 0,
     scratchItemId: null,
 
-    /*
-      모바일 문지르기 / 두 손가락 시점 이동 상태
-    */
     mobileScratchTouchId: null,
     mobileScratchStartX: 0,
     mobileScratchStartY: 0,
@@ -183,29 +168,6 @@ document.addEventListener("DOMContentLoaded", () => {
     buildGallery();
   } else {
     scene.addEventListener("loaded", buildGallery, { once: true });
-  }
-
-  /* =========================
-     이벤트
-  ========================= */
-  function enterSpace() {
-    state.isLeftMouseDown = false;
-    state.isRightDragging = false;
-    state.mobileScratchTouchId = null;
-    state.mobileScratchMoved = false;
-
-    pauseScratchPlayback();
-    resetScratchStroke();
-    resetAllScratchLayers();
-
-    state.started = true;
-    introOverlay?.classList.add("is-hidden");
-
-    if (guideText) {
-      guideText.innerHTML = state.isTouchDevice
-        ? "화면 오른쪽 하단 화살표 버튼으로 이동하세요. 손가락 두개로 드래그하면 시점이 바뀝니다. 손가락 한개로 책등을 긁을 때만 서평을 들을 수 있습니다."
-        : "W A S D 또는 화살표 키로 이동하세요. 마우스 오른쪽 버튼을 누르면서 드래그하면 시점이 바뀝니다. 마우스 왼쪽 버튼을 누르면서 책등을 긁을 때만 서평을 들을 수 있습니다.";
-    }
   }
 
   setupScratchIntro();
@@ -267,12 +229,40 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   /* =========================
+     이벤트
+  ========================= */
+  function enterSpace() {
+    state.isLeftMouseDown = false;
+    state.isRightDragging = false;
+    state.mobileScratchTouchId = null;
+    state.mobileScratchMoved = false;
+
+    pauseScratchPlayback();
+    resetScratchStroke();
+    resetAllScratchLayers();
+
+    state.started = true;
+    introOverlay?.classList.add("is-hidden");
+
+    if (guideText) {
+      guideText.innerHTML = state.isTouchDevice
+        ? "화면 오른쪽 하단 화살표 버튼으로 이동하세요. 손가락 두개로 드래그하면 시점이 바뀝니다. 손가락 한개로 책등을 긁을 때만 서평을 들을 수 있습니다."
+        : "W A S D 또는 화살표 키로 이동하세요. 마우스 오른쪽 버튼을 누르면서 드래그하면 시점이 바뀝니다. 마우스 왼쪽 버튼을 누르면서 책등을 긁을 때만 서평을 들을 수 있습니다.";
+    }
+  }
+
+  /* =========================
      갤러리 생성
   ========================= */
   function buildGallery() {
     galleryRoot.innerHTML = "";
     dynamicAssets.innerHTML = "";
     state.scratchLayerMap.clear();
+    state.imagePlaneMap.clear();
+    state.itemMap.clear();
+    state.iconTextMap.clear();
+    state.iconActivatedMap.clear();
+    state.audioStateMap.clear();
 
     const preparedItems = data.items.map((item, index) =>
       prepareItem(item, index)
@@ -367,20 +357,14 @@ document.addEventListener("DOMContentLoaded", () => {
         hitbox.addEventListener("mousedown", async (event) => {
           if (state.isTouchDevice) return;
 
-          const button =
-            event?.detail?.mouseEvent?.button ??
-            event?.button ??
-            0;
-
+          const button = event?.detail?.mouseEvent?.button ?? event?.button ?? 0;
           if (button !== 0) return;
 
           state.isLeftMouseDown = true;
           resetScratchStroke();
 
-          const clientX =
-            event?.detail?.mouseEvent?.clientX ?? event.clientX;
-          const clientY =
-            event?.detail?.mouseEvent?.clientY ?? event.clientY;
+          const clientX = event?.detail?.mouseEvent?.clientX ?? event.clientX;
+          const clientY = event?.detail?.mouseEvent?.clientY ?? event.clientY;
 
           const scratchedItem = handleScratchAtClientPoint(clientX, clientY);
           await startScratchPlayback(scratchedItem || item);
@@ -446,7 +430,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   /* =========================
-     왼쪽 -> 오른쪽 일렬 배치
+     일렬 배치
   ========================= */
   function updateWorldBounds(items) {
     if (items.length === 0) return;
@@ -548,9 +532,7 @@ document.addEventListener("DOMContentLoaded", () => {
     audio.setAttribute("webkit-playsinline", "");
 
     if (!sharedAudioContext) {
-      const AudioContextClass =
-        window.AudioContext || window.webkitAudioContext;
-
+      const AudioContextClass = window.AudioContext || window.webkitAudioContext;
       if (AudioContextClass) {
         sharedAudioContext = new AudioContextClass();
       }
@@ -607,9 +589,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     try {
       if (!sharedAudioContext) {
-        const AudioContextClass =
-          window.AudioContext || window.webkitAudioContext;
-
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
         if (AudioContextClass) {
           sharedAudioContext = new AudioContextClass();
         }
@@ -734,7 +714,8 @@ document.addEventListener("DOMContentLoaded", () => {
   function updateBoundsFromFloor() {
     if (!floorPlane) return;
 
-    const floorPosition = floorPlane.getAttribute("position") || { x: 0, y: 0, z: -12 };
+    const floorPosition =
+      floorPlane.getAttribute("position") || { x: 0, y: 0, z: -12 };
     const halfWidth = floorWidth / 2;
     const halfHeight = floorHeight / 2;
 
@@ -1019,8 +1000,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const y = (1 - uv.y) * layer.canvas.height;
 
     const previousPoint =
-      state.scratchLastPoint &&
-        state.scratchLastPoint.itemId === item.id
+      state.scratchLastPoint && state.scratchLastPoint.itemId === item.id
         ? state.scratchLastPoint
         : null;
 
@@ -1338,7 +1318,7 @@ document.addEventListener("DOMContentLoaded", () => {
       return closestItem;
     }
 
-    async function onTouchStart(event) {
+    function onTouchStart(event) {
       if (!state.started) return;
       if (isUiTarget(event.target)) return;
 
@@ -1604,7 +1584,9 @@ document.addEventListener("DOMContentLoaded", () => {
     if (introPosterImage.complete) {
       resizeScratchCanvas();
     } else {
-      introPosterImage.addEventListener("load", resizeScratchCanvas, { once: true });
+      introPosterImage.addEventListener("load", resizeScratchCanvas, {
+        once: true
+      });
     }
 
     window.addEventListener("resize", resizeScratchCanvas);
@@ -1613,7 +1595,9 @@ document.addEventListener("DOMContentLoaded", () => {
     window.addEventListener("mousemove", onPointerMove);
     window.addEventListener("mouseup", onPointerUp);
 
-    scratchCanvas.addEventListener("touchstart", onPointerDown, { passive: false });
+    scratchCanvas.addEventListener("touchstart", onPointerDown, {
+      passive: false
+    });
     window.addEventListener("touchmove", onPointerMove, { passive: false });
     window.addEventListener("touchend", onPointerUp, { passive: false });
 
