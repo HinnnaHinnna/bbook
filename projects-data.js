@@ -7,13 +7,11 @@
   1. 책등은 왼쪽 -> 오른쪽으로 일렬 배치
   2. 실제 책등 세로/가로(mm) 비율 반영
   3. 시작 위치를 더 가깝게 조정
-
-
 */
 
 window.EXHIBITION_DATA = {
   settings: {
-    spawnPosition: { x: -110, y: 0, z: 4 },
+    spawnPosition: { x: -119, y: 0, z: 4 },
 
     desktopAcceleration: 45,
     mobileMoveSpeed: 3.2,
@@ -38,11 +36,13 @@ window.EXHIBITION_DATA = {
     */
     floorWidth: 420,
     floorHeight: 50,
+
     /*
-        바닥 가장자리에서 얼마나 안쪽까지 이동 가능하게 할지
-        숫자가 클수록 가장자리 가까이 못 감
-      */
+      바닥 가장자리에서 얼마나 안쪽까지 이동 가능하게 할지
+      숫자가 클수록 가장자리 가까이 못 감
+    */
     floorEdgePadding: 3,
+
     /*
       카메라에서 얼마나 멀어지면 서서히 사라질지
       - fadeStartDistance: 여기부터 투명해지기 시작
@@ -64,8 +64,8 @@ window.EXHIBITION_DATA = {
       id: "work-01",
       title: "뉴노멀",
       description: "2022",
-      image: "assets/images/20_뉴노멀.webp",
-      audio: "assets/audio/20_뉴노멀.mp3",
+      image: "assets/images/work-01.webp",
+      audio: "assets/audio/work-01.mp3",
       spineHeightMm: 180,
       spineWidthMm: 21
     },
@@ -73,8 +73,8 @@ window.EXHIBITION_DATA = {
       id: "work-02",
       title: "디스이즈네버디스이즈네버댓",
       description: "2022",
-      image: "assets/images/20_디스이즈네버디스이즈네버댓.webp",
-      audio: "assets/audio/20_디스이즈네버디스이즈네버댓.mp3",
+      image: "assets/images/work-02.webp",
+      audio: "assets/audio/work-02.mp3",
       spineHeightMm: 248,
       spineWidthMm: 33
     },
@@ -82,8 +82,8 @@ window.EXHIBITION_DATA = {
       id: "work-03",
       title: "디에센셜조지오엘",
       description: "2022",
-      image: "assets/images/20_디에센셜조지오엘.webp",
-      audio: "assets/audio/20_디에센셜조지오엘.mp3",
+      image: "assets/images/work-03.webp",
+      audio: "assets/audio/work-03.mp3",
       spineHeightMm: 188,
       spineWidthMm: 31
     },
@@ -91,8 +91,8 @@ window.EXHIBITION_DATA = {
       id: "work-04",
       title: "모눈지우개",
       description: "2022",
-      image: "assets/images/20_모눈지우개.webp",
-      audio: "assets/audio/20_모눈지우개.mp3",
+      image: "assets/images/work-04.webp",
+      audio: "assets/audio/work-04.mp3",
       spineHeightMm: 207,
       spineWidthMm: 10
     },
@@ -100,8 +100,8 @@ window.EXHIBITION_DATA = {
       id: "work-05",
       title: "시와산책",
       description: "2022",
-      image: "assets/images/20_시와산책.webp",
-      audio: "assets/audio/20_시와산책.mp3",
+      image: "assets/images/work-05.webp",
+      audio: "assets/audio/work-05.mp3",
       spineHeightMm: 200,
       spineWidthMm: 15
     },
@@ -109,8 +109,8 @@ window.EXHIBITION_DATA = {
       id: "work-06",
       title: "IN THE SPOTLIGHT: 아리랑예술단",
       description: "2022",
-      image: "assets/images/20_아리랑예술단.webp",
-      audio: "assets/audio/20_아리랑예술단.mp3",
+      image: "assets/images/work-06.webp",
+      audio: "assets/audio/work-06.mp3",
       spineHeightMm: 245,
       spineWidthMm: 19
     },
@@ -118,8 +118,8 @@ window.EXHIBITION_DATA = {
       id: "work-07",
       title: "혁명노트",
       description: "2021",
-      image: "assets/images/21_블루노트.webp",
-      audio: "assets/audio/21_블루노트.mp3",
+      image: "assets/images/work-07.webp",
+      audio: "assets/audio/work-07.mp3",
       spineHeightMm: 188,
       spineWidthMm: 20
     },
@@ -127,8 +127,8 @@ window.EXHIBITION_DATA = {
       id: "work-08",
       title: "기록으로돌아보기",
       description: "2021",
-      image: "assets/images/21_기록으로돌아보기.webp",
-      audio: "assets/audio/21_기록으로돌아보기.mp3",
+      image: "assets/images/work-08.webp",
+      audio: "assets/audio/work-08.mp3",
       spineHeightMm: 205,
       spineWidthMm: 30
     },
@@ -136,8 +136,8 @@ window.EXHIBITION_DATA = {
       id: "work-09",
       title: "블루노트",
       description: "2021",
-      image: "assets/images/21_블루노트.webp",
-      audio: "assets/audio/21_블루노트.mp3",
+      image: "assets/images/work-09.webp",
+      audio: "assets/audio/work-09.mp3",
       spineHeightMm: 205,
       spineWidthMm: 19
     },
@@ -145,8 +145,8 @@ window.EXHIBITION_DATA = {
       id: "work-10",
       title: "아웃 오브 (콘)텍스트",
       description: "2021",
-      image: "assets/images/21_아웃 오브 (콘)텍스트.webp",
-      audio: "assets/audio/21_아웃-오브-(콘)텍스트.mp3",
+      image: "assets/images/work-10.webp",
+      audio: "assets/audio/work-10.mp3",
       spineHeightMm: 257,
       spineWidthMm: 20
     },
@@ -154,8 +154,8 @@ window.EXHIBITION_DATA = {
       id: "work-11",
       title: "작업의 방식",
       description: "2022",
-      image: "assets/images/22_작업의 방식.webp",
-      audio: "assets/audio/22_작업의-방식.mp3",
+      image: "assets/images/work-11.webp",
+      audio: "assets/audio/work-11.mp3",
       spineHeightMm: 280,
       spineWidthMm: 10
     },
@@ -163,8 +163,8 @@ window.EXHIBITION_DATA = {
       id: "work-12",
       title: "고수의 도구",
       description: "2022",
-      image: "assets/images/22_고수의 도구.webp",
-      audio: "assets/audio/22_고수의-도구.mp3",
+      image: "assets/images/work-12.webp",
+      audio: "assets/audio/work-12.mp3",
       spineHeightMm: 180,
       spineWidthMm: 11
     },
@@ -172,8 +172,8 @@ window.EXHIBITION_DATA = {
       id: "work-13",
       title: "곁에 있어",
       description: "2022",
-      image: "assets/images/22_곁에 있어.webp",
-      audio: "assets/audio/22_곁에-있어.mp3",
+      image: "assets/images/work-13.webp",
+      audio: "assets/audio/work-13.mp3",
       spineHeightMm: 180,
       spineWidthMm: 11
     },
@@ -181,8 +181,8 @@ window.EXHIBITION_DATA = {
       id: "work-14",
       title: "김군을 찾아서",
       description: "2022",
-      image: "assets/images/22_김군을 찾아서.webp",
-      audio: "assets/audio/22_김군을-찾아서.mp3",
+      image: "assets/images/work-14.webp",
+      audio: "assets/audio/work-14.mp3",
       spineHeightMm: 198,
       spineWidthMm: 15
     },
@@ -190,8 +190,8 @@ window.EXHIBITION_DATA = {
       id: "work-15",
       title: "미얀마 8요일력",
       description: "2022",
-      image: "assets/images/22_미얀마 8요일력.webp",
-      audio: "assets/audio/22_미얀마-8요일력1.mp3",
+      image: "assets/images/work-15.webp",
+      audio: "assets/audio/work-15.mp3",
       spineHeightMm: 234,
       spineWidthMm: 9
     },
@@ -199,8 +199,8 @@ window.EXHIBITION_DATA = {
       id: "work-16",
       title: "민간인 통제구역",
       description: "2022",
-      image: "assets/images/22_민간인 통제구역1 복사.webp",
-      audio: "assets/audio/22_민간인-통제구역.mp3",
+      image: "assets/images/work-16.webp",
+      audio: "assets/audio/work-16.mp3",
       spineHeightMm: 217,
       spineWidthMm: 35
     },
@@ -208,18 +208,18 @@ window.EXHIBITION_DATA = {
       id: "work-17",
       title: "셰익스피어 전집",
       description: "2022",
-      image: "assets/images/22_셰익스피어 전집.webp",
-      audio: "assets/audio/22_셰익스피어-전집.mp3",
+      image: "assets/images/work-17.webp",
+      audio: "assets/audio/work-17.mp3",
       spineHeightMm: 290,
       spineWidthMm: 80
     },
     {
       id: "work-18",
       title: "서문1.png",
-      image: "assets/images/서문1.png",
+      image: "assets/images/intro-panel-01.png",
       spineHeightMm: 11.2,
       spineWidthMm: 475,
-      xOffset: -89,
+      xOffset: -100,
       yOffset: 0,
       zOffset: 10,
       isDecorative: true
@@ -227,7 +227,7 @@ window.EXHIBITION_DATA = {
     {
       id: "work-19",
       title: "서문2.png",
-      image: "assets/images/서문2.png",
+      image: "assets/images/intro-panel-02.png",
       spineHeightMm: 11.2,
       spineWidthMm: 400,
       xOffset: -99.95,
@@ -238,7 +238,7 @@ window.EXHIBITION_DATA = {
     {
       id: "work-20",
       title: "서문3.png",
-      image: "assets/images/서문3.png",
+      image: "assets/images/intro-panel-03.png",
       spineHeightMm: 11.2,
       spineWidthMm: 485,
       xOffset: -99.9,
@@ -249,7 +249,7 @@ window.EXHIBITION_DATA = {
     {
       id: "work-21",
       title: "서문4.png",
-      image: "assets/images/서문4.png",
+      image: "assets/images/intro-panel-04.png",
       spineHeightMm: 11.2,
       spineWidthMm: 363,
       xOffset: -99.85,
@@ -260,7 +260,7 @@ window.EXHIBITION_DATA = {
     {
       id: "work-22",
       title: "서문5.png",
-      image: "assets/images/서문5.png",
+      image: "assets/images/intro-panel-05.png",
       spineHeightMm: 11.2,
       spineWidthMm: 180,
       xOffset: -99.8,
@@ -268,6 +268,5 @@ window.EXHIBITION_DATA = {
       zOffset: 10,
       isDecorative: true
     }
-
   ]
-}; 
+};
