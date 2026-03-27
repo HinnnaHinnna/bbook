@@ -19,17 +19,20 @@
 
 <body>
   <!-- 시작 오버레이 -->
-  <div id="introScratchBox" class="intro-scratch-box" aria-label="포스터를 긁어서 드러난 부분을 클릭하면 입장">
-    <img id="introPosterImage" src="assets/images/intro-poster.webp" alt="책등 포스터" class="intro-poster-image" />
-    <canvas id="scratchCanvas" class="scratch-canvas"></canvas>
+  <div id="introOverlay" class="intro-overlay">
+    <div class="intro-hero">
+      <div id="introScratchBox" class="intro-scratch-box" aria-label="포스터를 긁어서 드러난 부분을 클릭하면 입장">
+        <img id="introPosterImage" src="assets/images/intro-poster.webp" alt="책등 포스터" class="intro-poster-image" />
+        <canvas id="scratchCanvas" class="scratch-canvas"></canvas>
 
-    <div class="intro-marquee">
-      <div class="intro-marquee__track">
-        <span>긁어서 드러난 부분을 터치해 입장하세요.</span>
-        <span>긁어서 드러난 부분을 터치해 입장하세요.</span>
+        <div class="intro-marquee">
+          <div class="intro-marquee__track">
+            <span>긁어서 드러난 부분을 터치해 입장하세요.</span>
+            <span>긁어서 드러난 부분을 터치해 입장하세요.</span>
+          </div>
+        </div>
       </div>
     </div>
-  </div>
   </div>
 
   <!-- 상단 UI -->
