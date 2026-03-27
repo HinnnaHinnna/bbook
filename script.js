@@ -185,6 +185,18 @@ document.addEventListener("DOMContentLoaded", () => {
      이벤트
   ========================= */
   function enterSpace() {
+    /*
+      시작 화면에서 남아 있던 입력 상태를 먼저 초기화
+    */
+    state.isLeftMouseDown = false;
+    state.isRightDragging = false;
+    state.mobileScratchTouchId = null;
+    state.mobileScratchMoved = false;
+
+    pauseScratchPlayback();
+    resetScratchStroke();
+    resetAllScratchLayers();
+
     state.started = true;
     introOverlay.classList.add("is-hidden");
 
@@ -1048,6 +1060,17 @@ document.addEventListener("DOMContentLoaded", () => {
     mesh.material.needsUpdate = true;
   }
 
+  function resetAllScratchLayers() {
+    state.scratchLayerMap.forEach((layer, itemId) => {
+      if (!layer || !layer.ctx || !layer.canvas) return;
+
+      drawScratchCover(layer.ctx, layer.canvas.width, layer.canvas.height);
+      markScratchLayerDirty(itemId);
+    });
+
+    resetScratchStroke();
+  }
+
   function resetScratchStroke() {
     state.scratchLastPoint = null;
   }
@@ -1147,6 +1170,8 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function handleScratchAtClientPoint(clientX, clientY) {
+    if (!state.started) return null;
+
     const hit = getScratchHitFromClientPoint(clientX, clientY);
 
     if (!hit || !hit.item || !hit.uv) {
@@ -1176,16 +1201,12 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     window.addEventListener("mousedown", (event) => {
-      /*
-        왼쪽 버튼 상태 기록
-      */
+      if (!state.started) return;
+
       if (event.button === 0) {
         state.isLeftMouseDown = true;
       }
 
-      /*
-        오른쪽 버튼 드래그로 시점 이동 시작
-      */
       if (event.button === 2) {
         state.isRightDragging = true;
         state.lastRightDragX = event.clientX;
@@ -1197,6 +1218,8 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     window.addEventListener("mousemove", async (event) => {
+      if (!state.started) return;
+
       if (state.isRightDragging) {
         const lookControls = camera.components["look-controls"];
         if (!lookControls) return;
@@ -1224,9 +1247,6 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
 
-      /*
-        왼쪽 버튼을 누른 상태에서만 3D 책등 덮개를 긁는다.
-      */
       if (!state.isLeftMouseDown) return;
 
       const scratchedItem = handleScratchAtClientPoint(
