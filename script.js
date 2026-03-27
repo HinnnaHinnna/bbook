@@ -1616,9 +1616,19 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!ctx) return;
 
     let isPointerDown = false;
-    let hasMovedWhileDown = false;
     let lastPoint = null;
-    let wasRevealedOnPointerDown = false;
+    let downPoint = null;
+
+    /*
+      포인터를 누른 순간,
+      그 지점이 이미 드러나 있었는지 저장
+    */
+    let revealedBeforeDown = false;
+
+    /*
+      살짝 흔들린 정도는 클릭으로 인정
+    */
+    const enterTapThreshold = 10;
 
     function resizeScratchCanvas() {
       const rect = introScratchBox.getBoundingClientRect();
@@ -1634,10 +1644,9 @@ document.addEventListener("DOMContentLoaded", () => {
       ctx.scale(dpr, dpr);
 
       /*
-   처음에는 회색 단면으로 덮는다
- */
+        처음에는 단면 색으로 덮는다
+      */
       drawScratchCover(ctx, rect.width, rect.height);
-
     }
 
     function getLocalPoint(event) {
@@ -1699,14 +1708,25 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const point = getLocalPoint(event);
 
-      wasRevealedOnPointerDown = isRevealedAt(point);
       isPointerDown = true;
-      hasMovedWhileDown = false;
+      downPoint = point;
       lastPoint = point;
+
+      /*
+        누르기 직전 상태를 먼저 저장
+        이 값이 true일 때만 '입장 클릭' 가능
+      */
+      revealedBeforeDown = isRevealedAt(point);
 
       document.body.classList.add("is-scratching");
 
-      scratchAt(point);
+      /*
+        이미 드러난 곳을 클릭한 경우에는
+        새로 긁지 않는다.
+      */
+      if (!revealedBeforeDown) {
+        scratchAt(point);
+      }
     }
 
     function onPointerMove(event) {
@@ -1714,7 +1734,6 @@ document.addEventListener("DOMContentLoaded", () => {
       event.preventDefault();
 
       const point = getLocalPoint(event);
-      hasMovedWhileDown = true;
       scratchAt(point);
       lastPoint = point;
     }
@@ -1725,14 +1744,22 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const point = getLocalPoint(event);
 
-      if (!hasMovedWhileDown && wasRevealedOnPointerDown) {
+      const movedDistance = downPoint
+        ? Math.hypot(point.x - downPoint.x, point.y - downPoint.y)
+        : Infinity;
+
+      /*
+        누른 순간 이미 드러나 있던 부분을
+        거의 움직이지 않고 탭했을 때만 입장
+      */
+      if (movedDistance <= enterTapThreshold && revealedBeforeDown) {
         enterSpace();
       }
 
       isPointerDown = false;
-      hasMovedWhileDown = false;
       lastPoint = null;
-      wasRevealedOnPointerDown = false;
+      downPoint = null;
+      revealedBeforeDown = false;
 
       document.body.classList.remove("is-scratching");
     }
@@ -1752,11 +1779,12 @@ document.addEventListener("DOMContentLoaded", () => {
     scratchCanvas.addEventListener("touchstart", onPointerDown, { passive: false });
     window.addEventListener("touchmove", onPointerMove, { passive: false });
     window.addEventListener("touchend", onPointerUp, { passive: false });
+
     window.addEventListener("blur", () => {
       isPointerDown = false;
-      hasMovedWhileDown = false;
       lastPoint = null;
-      wasRevealedOnPointerDown = false;
+      downPoint = null;
+      revealedBeforeDown = false;
       document.body.classList.remove("is-scratching");
     });
 

@@ -7,10 +7,10 @@
 
 :root {
   /* 시작 화면 + 3D 책등 덮개 색을 같이 제어 */
-  --scratch-overlay-color: #ff6ae6;
+  --scratch-overlay-color: #a4a4a4;
 
   /* 시작 화면 + 3D 책등 긁기 브러시 크기 */
-  --scratch-brush-size: 42;
+  --scratch-brush-size: 15;
 }
 
 
@@ -79,42 +79,29 @@ body {
   display: block;
   user-select: none;
   -webkit-user-select: none;
-}
-
-.intro-poster-image {
-  display: block;
-  width: 100%;
-  height: auto;
-  object-fit: contain;
-  filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.18));
-  pointer-events: none;
-}
-
-.scratch-canvas {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  display: block;
-  touch-action: none;
-}
-
-/*
-  마퀴 바
-*/
-.intro-marquee {
-  width: min(92vw, 400px);
-  max-width: 100%;
   overflow: hidden;
-  background: rgb(255, 255, 255, 0);
-  /* backdrop-filter: blur(15px); */
+  /* 포스터 박스 안에서만 보이게 */
+}
+
+.intro-marquee {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  max-width: none;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0);
+  z-index: 3;
+  pointer-events: none;
+  /* 클릭 방해 안 하게 */
 }
 
 .intro-marquee__track {
   display: flex;
   width: max-content;
   gap: 56px;
-  padding: 0px 0;
+  padding: 8px 0 10px;
   animation: intro-marquee-move 12s linear infinite;
 }
 
@@ -147,15 +134,18 @@ body {
   }
 
   .intro-marquee {
-    width: 100vw;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
     max-width: none;
-    margin-left: calc(50% - 50vw);
-    margin-right: calc(50% - 50vw);
+    margin-left: 0;
+    margin-right: 0;
     padding: 0;
   }
 
   .intro-marquee__track {
-    padding: 0;
+    padding: 6px 0 8px;
   }
 
   .intro-marquee__track span {
