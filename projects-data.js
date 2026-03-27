@@ -230,7 +230,7 @@ window.EXHIBITION_DATA = {
       image: "assets/images/intro-panel-02.png",
       spineHeightMm: 11.2,
       spineWidthMm: 400,
-      xOffset: -99.95,
+      xOffset: -77.95,
       yOffset: 0,
       zOffset: 10,
       isDecorative: true
@@ -241,7 +241,7 @@ window.EXHIBITION_DATA = {
       image: "assets/images/intro-panel-03.png",
       spineHeightMm: 11.2,
       spineWidthMm: 485,
-      xOffset: -99.9,
+      xOffset: -77.9,
       yOffset: 0,
       zOffset: 10,
       isDecorative: true
@@ -252,7 +252,7 @@ window.EXHIBITION_DATA = {
       image: "assets/images/intro-panel-04.png",
       spineHeightMm: 11.2,
       spineWidthMm: 363,
-      xOffset: -99.85,
+      xOffset: -77.85,
       yOffset: 0,
       zOffset: 10,
       isDecorative: true
@@ -263,7 +263,7 @@ window.EXHIBITION_DATA = {
       image: "assets/images/intro-panel-05.png",
       spineHeightMm: 11.2,
       spineWidthMm: 180,
-      xOffset: -99.8,
+      xOffset: -77.8,
       yOffset: 0,
       zOffset: 10,
       isDecorative: true

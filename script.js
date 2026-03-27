@@ -83,7 +83,7 @@ document.addEventListener("DOMContentLoaded", () => {
   1 = 원본 크기
   1.6 ~ 2.2 정도부터 체감상 더 커짐
 */
-  const audioBoost = 1.9;
+  const audioBoost = 2.9;
 
   let sharedAudioContext = null;
   const audioNodeMap = new Map();
