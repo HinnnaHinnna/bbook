@@ -278,7 +278,7 @@ body {
 }
 
 .guide-line+.guide-line {
-  margin-top: 5px;
+  margin-top: 4.5px;
 }
 
 /* =========================
@@ -324,12 +324,12 @@ body {
   height: 58px;
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.15);
-  color: #565656;
+  color: #c6c5c5;
   border: 0.5px solid rgba(255, 255, 255, 0.5);
   font-size: 22px;
   font-weight: 700;
   outline: none;
-  box-shadow: 0 5px 5px rgba(86, 86, 86, 0.15);
+  box-shadow: 0 4px 4px rgba(86, 86, 86, 0.15);
   pointer-events: auto;
   touch-action: none;
   user-select: none;
