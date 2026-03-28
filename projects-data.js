@@ -20,8 +20,8 @@ window.EXHIBITION_DATA = {
     floorWidth: 420,
     floorHeight: 50,
     floorEdgePadding: 3,
-    fadeStartDistance: 18,
-    fadeEndDistance: 36,
+    fadeStartDistance: 10,
+    fadeEndDistance: 22,
     fadeMinOpacity: 0
   },
 
