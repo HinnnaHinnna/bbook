@@ -1,17 +1,12 @@
 @import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css");
 
-/* =========================
-   기본 리셋
-   ========================= */
 * {
   box-sizing: border-box;
 }
 
 :root {
-  /* 책등 위를 덮는 회색 단면 색 */
   --scratch-overlay-color: #a4a4a4;
 
-  /* 긁기 브러시 크기 */
   --scratch-brush-size: 15;
 }
 
@@ -34,9 +29,6 @@ body {
   color: #111;
 }
 
-/* =========================
-   3D 씬
-   ========================= */
 #scene {
   position: fixed;
   inset: 0;
@@ -45,9 +37,6 @@ body {
   z-index: 1;
 }
 
-/* =========================
-   인트로 오버레이
-   ========================= */
 .intro-overlay {
   position: fixed;
   inset: 0;
@@ -142,9 +131,6 @@ body {
   }
 }
 
-/* =========================
-   상단 UI
-   ========================= */
 .top-ui {
   position: fixed;
   top: 18px;
@@ -163,10 +149,6 @@ body {
   pointer-events: auto;
 }
 
-/* 
-  데스크탑 가이드 박스 폭을 모바일 느낌으로 더 짧게 줄임.
-  이전보다 훨씬 덜 길게 보일 것.
-*/
 .top-ui__left {
   width: min(380px, calc(100vw - 118px));
 }
@@ -178,11 +160,6 @@ body {
   justify-content: flex-end;
 }
 
-/* =========================
-   가이드 박스
-   ========================= */
-
-/* 열렸을 때 */
 .guide-box {
   width: 100%;
   padding: 7px 10px 5px;
@@ -194,7 +171,6 @@ body {
   color: #dfdfdf;
 }
 
-/* 헤더는 항상 양쪽 끝 정렬 */
 .guide-box__header {
   display: flex;
   align-items: center;
@@ -203,7 +179,6 @@ body {
   width: 100%;
 }
 
-/* 본문은 펼쳐질 때만 보임 */
 .guide-box__body {
   margin-top: 12px;
   max-height: 140px;
@@ -215,20 +190,17 @@ body {
     margin-top 0.24s ease;
 }
 
-/* 접혔을 때는 본문만 숨김 */
 .guide-box.is-collapsed .guide-box__body {
   margin-top: 0;
   max-height: 0;
   opacity: 0;
 }
 
-/* 접혔을 때는 pill 형태 */
 .guide-box.is-collapsed {
   width: 100%;
   border-radius: 999px;
 }
 
-/* 왼쪽 라벨 */
 .mini-label {
   margin: 0;
   font-size: 12px;
@@ -240,7 +212,6 @@ body {
   flex: 0 0 auto;
 }
 
-/* 열기 / 접기 버튼 */
 .guide-toggle-btn {
   margin: 0;
   padding: 0;
@@ -256,12 +227,6 @@ body {
   flex: 0 0 auto;
 }
 
-/* 
-  가이드 문장 행간을 줄이고 싶을 때
-  바로 이 line-height 값을 더 낮추면 된다.
-  1.18 → 더 촘촘
-  1.3  → 더 넓음
-*/
 .guide-text {
   margin: 0;
   font-size: 12px;
@@ -281,9 +246,6 @@ body {
   margin-top: 4px;
 }
 
-/* =========================
-   공통 버튼
-   ========================= */
 .ghost-btn {
   padding: 7px 10px 5px;
   border-radius: 999px;
@@ -305,9 +267,6 @@ body {
   color: #4f7187;
 }
 
-/* =========================
-   모바일 이동 버튼
-   ========================= */
 .mobile-controls {
   position: fixed;
   right: 18px;
@@ -362,9 +321,6 @@ body {
   }
 }
 
-/* =========================
-   모바일 대응
-   ========================= */
 @media (max-width: 768px) {
   .intro-hero {
     gap: 10px;
@@ -398,7 +354,6 @@ body {
     gap: 10px;
   }
 
-  /* 모바일 폭 유지 */
   .top-ui__left {
     width: min(320px, calc(100vw - 108px));
   }
@@ -414,7 +369,6 @@ body {
     border-radius: 999px;
   }
 
-  /* 모바일에서도 행간을 약간만 촘촘하게 */
   .guide-text {
     font-size: 13px;
     line-height: 1.2;
@@ -427,9 +381,6 @@ body {
   }
 }
 
-/* =========================
-   커서 상태
-   ========================= */
 .a-canvas,
 .a-canvas:hover,
 .scratch-canvas,
