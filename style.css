@@ -185,6 +185,10 @@ body {
   pointer-events: auto;
 }
 
+.top-ui__left {
+  width: min(520px, calc(100vw - 118px));
+}
+
 .top-ui__right {
   display: flex;
   gap: 8px;
@@ -192,16 +196,54 @@ body {
   justify-content: flex-end;
 }
 
-.guide-text {
-  margin: 4px 0 0;
-  font-size: 15px;
-  font-weight: 350;
-  line-height: 1.45;
-  color: #dfdfdf;
+.guide-box {
+  width: 100%;
+  padding: 11px 12px 12px;
+  border-radius: 18px;
+  border: 0.5px solid rgba(255, 255, 255, 0.38);
+  background: rgba(70, 70, 70, 0.22);
+  backdrop-filter: blur(14px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.14);
+}
 
+.guide-box__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.guide-box__body {
+  margin-top: 8px;
+  max-height: 220px;
+  overflow: hidden;
+  opacity: 1;
+  transition: max-height 0.24s ease, opacity 0.24s ease, margin-top 0.24s ease;
+}
+
+.guide-box.is-collapsed .guide-box__body {
+  margin-top: 0;
+  max-height: 0;
+  opacity: 0;
+}
+
+.guide-text {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 350;
+  line-height: 1.5;
+  color: #f2f2f2;
   white-space: normal;
   word-break: keep-all;
   overflow-wrap: normal;
+}
+
+.guide-line {
+  display: block;
+}
+
+.guide-line+.guide-line {
+  margin-top: 4px;
 }
 
 .mini-label {
@@ -209,7 +251,19 @@ body {
   font-size: 11px;
   font-weight: 500;
   letter-spacing: 0.16em;
-  color: #6f8797;
+  color: #d7d7d7;
+}
+
+.guide-toggle-btn {
+  padding: 6px 10px;
+  border: 0.5px solid rgba(255, 255, 255, 0.34);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  color: #f2f2f2;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1;
+  cursor: pointer;
 }
 
 .ghost-btn {
@@ -239,20 +293,20 @@ body {
   right: 18px;
   bottom: 18px;
   z-index: 12;
-  width: 180px;
-  height: 180px;
+  width: 162px;
+  height: 162px;
   pointer-events: none;
 }
 
 .move-btn {
   position: absolute;
-  width: 50px;
-  height: 50px;
+  width: 58px;
+  height: 58px;
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.15);
-  color: #707070;
+  color: #565656;
   border: 0.5px solid rgba(255, 255, 255, 0.5);
-  font-size: 18px;
+  font-size: 22px;
   font-weight: 700;
   outline: none;
   box-shadow: 0 5px 5px rgba(86, 86, 86, 0.15);
@@ -263,22 +317,22 @@ body {
 }
 
 .move-btn--up {
-  left: 40px;
+  left: 52px;
   top: 0;
 }
 
 .move-btn--left {
   left: 0;
-  top: 40px;
+  top: 52px;
 }
 
 .move-btn--right {
   right: 0;
-  top: 40px;
+  top: 52px;
 }
 
 .move-btn--down {
-  left: 40px;
+  left: 52px;
   bottom: 0;
 }
 
@@ -311,6 +365,32 @@ body {
 
   .intro-marquee__track span {
     font-size: 15px;
+  }
+
+  .top-ui {
+    top: 14px;
+    left: 14px;
+    right: 14px;
+    gap: 10px;
+  }
+
+  .top-ui__left {
+    width: min(320px, calc(100vw - 108px));
+  }
+
+  .guide-box {
+    padding: 10px 10px 11px;
+    border-radius: 16px;
+  }
+
+  .guide-text {
+    font-size: 13px;
+    line-height: 1.45;
+  }
+
+  .guide-toggle-btn,
+  .ghost-btn {
+    font-size: 11px;
   }
 }
 

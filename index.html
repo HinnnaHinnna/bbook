@@ -8,7 +8,7 @@
 
   <script src="https://aframe.io/releases/1.7.1/aframe.min.js"></script>
 
-  <link rel="stylesheet" href="style.css?v=20260327-13" />
+  <link rel="stylesheet" href="style.css?v=20260328-01" />
 </head>
 
 <body>
@@ -30,10 +30,21 @@
 
   <div class="top-ui">
     <div class="top-ui__left">
-      <p class="mini-label"></p>
-      <p id="guideText" class="guide-text">
-        책등을 클릭하면 소리가 재생됩니다.
-      </p>
+      <div id="guideBox" class="guide-box">
+        <div class="guide-box__header">
+          <p class="mini-label">GUIDE</p>
+          <button id="guideToggleButton" class="guide-toggle-btn" type="button" aria-expanded="true"
+            aria-controls="guideBoxBody">
+            접기
+          </button>
+        </div>
+
+        <div id="guideBoxBody" class="guide-box__body">
+          <p id="guideText" class="guide-text">
+            책등을 클릭하면 소리가 재생됩니다.
+          </p>
+        </div>
+      </div>
     </div>
 
     <div class="top-ui__right">
@@ -64,8 +75,8 @@
       <a-entity id="camera" camera position="0 1.6 0"></a-entity>
   </a-scene>
 
-  <script src="projects-data.js?v=20260327-13"></script>
-  <script src="script.js?v=20260327-13"></script>
+  <script src="projects-data.js?v=20260328-01"></script>
+  <script src="script.js?v=20260328-01"></script>
 </body>
 
 </html>

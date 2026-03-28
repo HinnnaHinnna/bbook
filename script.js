@@ -18,6 +18,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const introPosterImage = document.getElementById("introPosterImage");
   const scratchCanvas = document.getElementById("scratchCanvas");
 
+  const guideBox = document.getElementById("guideBox");
+  const guideBoxBody = document.getElementById("guideBoxBody");
+  const guideToggleButton = document.getElementById("guideToggleButton");
   const guideText = document.getElementById("guideText");
   const resetPositionButton = document.getElementById("resetPositionButton");
   const mobileControls = document.getElementById("mobileControls");
@@ -127,6 +130,19 @@ document.addEventListener("DOMContentLoaded", () => {
     paused: "PAUSE"
   };
 
+  const GUIDE_MESSAGES = {
+    touch: [
+      "화면 오른쪽 하단 화살표 버튼으로 이동하세요.",
+      "손가락 두 개로 드래그하면 시점이 바뀝니다.",
+      "손가락 한 개로 책등을 긁을 때만 서평을 들을 수 있습니다."
+    ],
+    desktop: [
+      "W A S D 또는 화살표 키로 이동하세요.",
+      "마우스 오른쪽 버튼을 누르면서 드래그하면 시점이 바뀝니다.",
+      "마우스 왼쪽 버튼을 누르면서 책등을 긁을 때만 서평을 들을 수 있습니다."
+    ]
+  };
+
   rig.setAttribute(
     "wasd-controls",
     `acceleration: ${desktopAcceleration}; fly: false`
@@ -160,6 +176,14 @@ document.addEventListener("DOMContentLoaded", () => {
   } else {
     scene.addEventListener("loaded", buildGallery, { once: true });
   }
+
+  setGuideTextByDevice();
+  setGuideBoxCollapsed(false);
+
+  guideToggleButton?.addEventListener("click", () => {
+    const isCollapsed = guideBox?.classList.contains("is-collapsed");
+    setGuideBoxCollapsed(!isCollapsed);
+  });
 
   setupScratchIntro();
   setupDesktopInteraction();
@@ -234,10 +258,31 @@ document.addEventListener("DOMContentLoaded", () => {
     state.started = true;
     introOverlay?.classList.add("is-hidden");
 
-    if (guideText) {
-      guideText.innerHTML = state.isTouchDevice
-        ? "화면 오른쪽 하단 화살표 버튼으로 이동하세요. 손가락 두개로 드래그하면 시점이 바뀝니다. 손가락 한개로 책등을 긁을 때만 서평을 들을 수 있습니다."
-        : "W A S D 또는 화살표 키로 이동하세요. 마우스 오른쪽 버튼을 누르면서 드래그하면 시점이 바뀝니다. 마우스 왼쪽 버튼을 누르면서 책등을 긁을 때만 서평을 들을 수 있습니다.";
+    setGuideTextByDevice();
+    setGuideBoxCollapsed(false);
+  }
+
+  function setGuideTextByDevice() {
+    if (!guideText) return;
+
+    const messages = state.isTouchDevice
+      ? GUIDE_MESSAGES.touch
+      : GUIDE_MESSAGES.desktop;
+
+    guideText.innerHTML = messages
+      .map((message) => `<span class="guide-line">${message}</span>`)
+      .join("");
+  }
+
+  function setGuideBoxCollapsed(shouldCollapse) {
+    if (!guideBox || !guideToggleButton) return;
+
+    guideBox.classList.toggle("is-collapsed", shouldCollapse);
+    guideToggleButton.setAttribute("aria-expanded", String(!shouldCollapse));
+    guideToggleButton.textContent = shouldCollapse ? "열기" : "접기";
+
+    if (guideBoxBody) {
+      guideBoxBody.setAttribute("aria-hidden", String(shouldCollapse));
     }
   }
 
