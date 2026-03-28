@@ -8,7 +8,7 @@
 
   <script src="https://aframe.io/releases/1.7.1/aframe.min.js"></script>
 
-  <link rel="stylesheet" href="style.css?v=20260327-13" />
+  <link rel="stylesheet" href="style.css?v=20260327-12" />
 </head>
 
 <body>
@@ -61,11 +61,13 @@
     <a-entity id="galleryRoot"></a-entity>
 
     <a-entity id="cameraRig" position="0 0 -3" wasd-controls="acceleration: 45; fly: false">
-      <a-entity id="camera" camera position="0 1.6 0"></a-entity>
+      <a-entity id="camera" camera position="0 1.6 0"
+        look-controls="mouseEnabled: true; touchEnabled: true; pointerLockEnabled: false; magicWindowTrackingEnabled: false"></a-entity>
+    </a-entity>
   </a-scene>
 
-  <script src="projects-data.js?v=20260327-13"></script>
-  <script src="script.js?v=20260327-13"></script>
+  <script src="projects-data.js?v=20260327-12"></script>
+  <script src="script.js?v=20260327-12"></script>
 </body>
 
 </html>
