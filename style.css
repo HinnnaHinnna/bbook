@@ -205,7 +205,7 @@ body {
 
 /* 본문은 펼쳐질 때만 보임 */
 .guide-box__body {
-  margin-top: 8px;
+  margin-top: 12px;
   max-height: 140px;
   overflow: hidden;
   opacity: 1;
