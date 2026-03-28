@@ -205,6 +205,7 @@ document.addEventListener("DOMContentLoaded", () => {
     stopAllMovement();
     window.resetMobileTouchState?.();
     pauseScratchPlayback();
+    state.audioUnlocked = false;
     document.body.classList.remove("is-view-dragging");
     document.body.classList.remove("is-scratching");
   });
@@ -214,6 +215,7 @@ document.addEventListener("DOMContentLoaded", () => {
       stopAllMovement();
       window.resetMobileTouchState?.();
       pauseScratchPlayback();
+      state.audioUnlocked = false;
       document.body.classList.remove("is-view-dragging");
       document.body.classList.remove("is-scratching");
     }
@@ -609,7 +611,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const audio = getOrCreateAudio(item);
 
-    try {
+    async function tryPlayOnce() {
       if (!state.audioUnlocked) {
         await unlockAudioForItem(item);
       }
@@ -623,7 +625,11 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       audio.muted = false;
-      await audio.play();
+      return audio.play();
+    }
+
+    try {
+      await tryPlayOnce();
 
       state.currentPlayingId = item.id;
       state.scratchItemId = item.id;
@@ -631,7 +637,30 @@ document.addEventListener("DOMContentLoaded", () => {
       updateIcon(item.id, "playing");
       document.body.classList.add("is-scratching");
     } catch (error) {
-      console.error("스크래치 재생 실패:", item.id, item.audio, error);
+      console.warn("1차 스크래치 재생 실패, 재시도:", item.id, error);
+
+      try {
+        /*
+          iOS Chrome 대응:
+          잠금 상태를 다시 초기화하고 아주 짧게 기다린 뒤 1회 재시도
+        */
+        state.audioUnlocked = false;
+
+        if (sharedAudioContext?.state === "suspended") {
+          await sharedAudioContext.resume();
+        }
+
+        await new Promise((resolve) => setTimeout(resolve, 40));
+        await tryPlayOnce();
+
+        state.currentPlayingId = item.id;
+        state.scratchItemId = item.id;
+        state.audioStateMap.set(item.id, "playing");
+        updateIcon(item.id, "playing");
+        document.body.classList.add("is-scratching");
+      } catch (retryError) {
+        console.error("스크래치 재생 최종 실패:", item.id, item.audio, retryError);
+      }
     }
   }
 
